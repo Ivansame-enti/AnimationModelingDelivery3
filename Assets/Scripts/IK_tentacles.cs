@@ -164,9 +164,7 @@ public class IK_tentacles : MonoBehaviour
         NotifyShootIK();
     }
 
-
     #endregion
-
 
     // Start is called before the first frame update
     void Start()
@@ -181,8 +179,6 @@ public class IK_tentacles : MonoBehaviour
         _myController.SwingMin = _swingMin;
 
     }
-
-
 
     // Update is called once per frame
     void Update()
