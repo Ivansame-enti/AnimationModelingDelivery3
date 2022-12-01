@@ -10,9 +10,12 @@ public class MovingBall : MonoBehaviour
     //movement speed in units per second
     [Range(-1.0f, 1.0f)]
     [SerializeField]
-    private float _movementSpeed = 5f;
+    private float _movementSpeed = 10f;
 
-    Vector3 _dir;
+    public Transform ballTarget;
+    private bool _shootBall = false;
+    public float ballSpeed=10f;
+    private Vector3 ballDirection;
 
     // Start is called before the first frame update
     void Start()
@@ -35,8 +38,15 @@ public class MovingBall : MonoBehaviour
 
     }
 
+    private void FixedUpdate()
+    {
+        if (_shootBall) GetComponent<Rigidbody>().AddForce(ballDirection.normalized * ballSpeed);
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         _myOctopus.NotifyShoot();
+        _shootBall = true;
+        ballDirection = ballTarget.position - this.transform.position;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using OctopusController;
 
 public class IK_Scorpion : MonoBehaviour
@@ -26,12 +27,15 @@ public class IK_Scorpion : MonoBehaviour
     public Transform[] legTargets;
     public Transform[] futureLegBases;
 
+    public Slider forceSlider;
+    private bool _sliderGoUp=true;
+    public float _slideSpeed = 500f;
+
     // Start is called before the first frame update
     void Start()
     {
         _myController.InitLegs(legs,futureLegBases,legTargets);
         _myController.InitTail(tail);
-
     }
 
     // Update is called once per frame
@@ -42,7 +46,16 @@ public class IK_Scorpion : MonoBehaviour
 
         NotifyTailTarget();
         
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space))
+        {
+            if (forceSlider.value >= forceSlider.maxValue) _sliderGoUp = false;
+            if (forceSlider.value <= forceSlider.minValue) _sliderGoUp = true;
+
+            if(_sliderGoUp) forceSlider.value += Time.deltaTime * _slideSpeed;
+            else forceSlider.value -= Time.deltaTime * _slideSpeed;
+        }
+
+        if (Input.GetKeyUp(KeyCode.Space))
         {
             NotifyStartWalk();
             animTime = 0;
