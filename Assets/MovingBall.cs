@@ -11,7 +11,8 @@ public class MovingBall : MonoBehaviour
     [Range(-1.0f, 1.0f)]
     [SerializeField]
     private float _movementSpeed = 5f;
-
+    private float _AngularVeolocity = 1f;
+    private float AirResistance = 0.5f;
     Vector3 _dir;
 
     // Start is called before the first frame update
@@ -29,7 +30,8 @@ public class MovingBall : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         //get the Input from Vertical axis
         float verticalInput = Input.GetAxis("Vertical");
-
+        Debug.Log(horizontalInput);
+        Debug.Log(verticalInput);
         //update the position
         transform.position = transform.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0);
 
