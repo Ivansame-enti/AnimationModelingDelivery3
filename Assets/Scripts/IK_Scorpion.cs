@@ -11,7 +11,7 @@ public class IK_Scorpion : MonoBehaviour
     public IK_tentacles _myOctopus;
 
     [Header("Body")]
-    float animTime;
+    public float animTime;
     public float animDuration = 5;
     bool animPlaying = false;
     public Transform Body;
@@ -21,6 +21,7 @@ public class IK_Scorpion : MonoBehaviour
     [Header("Tail")]
     public Transform tailTarget;
     public Transform tail;
+    //private Quaternion[] _originalTaillRotations;
 
     [Header("Legs")]
     public Transform[] legs;
@@ -29,13 +30,23 @@ public class IK_Scorpion : MonoBehaviour
 
     public Slider forceSlider;
     private bool _sliderGoUp=true;
-    public float _slideSpeed = 500f;
+    public float _slideSpeed = 7f;
+
+    //private bool _firstTimePressed = true;
+    //private Vector3 _scorpionOriginalPosition;
+    //private Vector3 _ballOriginalPosition;
 
     // Start is called before the first frame update
     void Start()
     {
+        /*_originalTaillRotations = new Quaternion[3];
+        _originalTaillRotations[0] = tail.rotation;
+        _originalTaillRotations[1] = tail.rotation;
+        _originalTaillRotations[2] = tail.rotation;*/
         _myController.InitLegs(legs,futureLegBases,legTargets);
         _myController.InitTail(tail);
+        //_scorpionOriginalPosition = this.transform.position;
+        //_ballOriginalPosition = tailTarget.position;
     }
 
     // Update is called once per frame
@@ -48,6 +59,13 @@ public class IK_Scorpion : MonoBehaviour
         
         if (Input.GetKey(KeyCode.Space))
         {
+            /*if (_firstTimePressed)
+            {
+                this.transform.position = _scorpionOriginalPosition;
+                tailTarget.position = _ballOriginalPosition;
+                _firstTimePressed = false;
+            }*/
+
             if (forceSlider.value >= forceSlider.maxValue) _sliderGoUp = false;
             if (forceSlider.value <= forceSlider.minValue) _sliderGoUp = true;
 
@@ -57,9 +75,8 @@ public class IK_Scorpion : MonoBehaviour
 
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            NotifyStartWalk();
-            animTime = 0;
-            animPlaying = true;
+            StartWalk();
+            //_firstTimePressed = true;
         }
 
         if (animTime < animDuration)
@@ -86,5 +103,12 @@ public class IK_Scorpion : MonoBehaviour
     {
 
         _myController.NotifyStartWalk();
+    }
+
+    public void StartWalk()
+    {
+        NotifyStartWalk();
+        animTime = 0;
+        animPlaying = true;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MovingBall : MonoBehaviour
 {
@@ -17,10 +18,14 @@ public class MovingBall : MonoBehaviour
     public float ballSpeed=10f;
     private Vector3 ballDirection;
 
+    private float _timer;
+    private float _stopForce=2;
+
+    public Slider forceSlider;
     // Start is called before the first frame update
     void Start()
     {
-        
+        _timer = 0;
     }
 
     // Update is called once per frame
@@ -36,17 +41,32 @@ public class MovingBall : MonoBehaviour
         //update the position
         transform.position = transform.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0);
 
+        /*if (_shootBall)
+        {
+            if (_timer >= _stopForce)
+            {
+                _timer = 0;
+                _shootBall = false;
+            }
+            else _timer += Time.deltaTime;
+        }*/
+
     }
 
     private void FixedUpdate()
     {
-        if (_shootBall) GetComponent<Rigidbody>().AddForce(ballDirection.normalized * ballSpeed);
+        if (_shootBall)
+        {
+            GetComponent<Rigidbody>().AddForce(ballDirection.normalized * ballSpeed, ForceMode.Impulse);
+            _shootBall = false;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         _myOctopus.NotifyShoot();
         _shootBall = true;
+        ballSpeed = forceSlider.value;
         ballDirection = ballTarget.position - this.transform.position;
     }
 }
