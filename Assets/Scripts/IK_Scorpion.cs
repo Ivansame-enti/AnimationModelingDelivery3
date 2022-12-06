@@ -43,7 +43,7 @@ public class IK_Scorpion : MonoBehaviour
     Vector3[] _tailOffset = null;
     private float _deltaGradient = 0.1f; // Used to simulate gradient (degrees)
     private float _learningRate = 3.0f; // How much we move depending on the gradient
-    private float _distanceThreshold = 5.0f;
+    private float _distanceThreshold = 3.0f;
 
     //LEGS
     Transform[] _legTargets = null;
