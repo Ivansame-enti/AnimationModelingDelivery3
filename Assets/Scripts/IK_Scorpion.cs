@@ -67,11 +67,7 @@ public class IK_Scorpion : MonoBehaviour
         _tailBones[4] = _tailBones[3].GetChild(1);
 
         for (int i = 0; i < _tailBones.Length; i++) _originalTaillRotations[i] = _tailBones[i].rotation;
-        /*_originalTaillRotations[0] = tail.rotation;
-        _originalTaillRotations[1] = tail.GetChild(1).rotation;
-        _originalTaillRotations[2] = tail.GetChild(1).GetChild(1).rotation;
-        _originalTaillRotations[3] = tail.GetChild(1).GetChild(1).GetChild(1).rotation;
-        _originalTaillRotations[2] = tail.GetChild(1).GetChild(1).GetChild(1).rotation;*/
+
         InitLegs(legs,futureLegBases,legTargets);
         InitTail(tail);
     }
