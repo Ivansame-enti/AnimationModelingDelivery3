@@ -21,7 +21,7 @@ public class IK_Scorpion : MonoBehaviour
     [Header("Tail")]
     public Transform tailTarget;
     public Transform tail;
-    //private Quaternion[] _originalTaillRotations;
+    private Quaternion[] _originalTaillRotations;
 
     [Header("Legs")]
     public Transform[] legs;
@@ -32,21 +32,38 @@ public class IK_Scorpion : MonoBehaviour
     private bool _sliderGoUp=true;
     public float _slideSpeed = 7f;
 
-    //private bool _firstTimePressed = true;
-    //private Vector3 _scorpionOriginalPosition;
-    //private Vector3 _ballOriginalPosition;
+    //Iks
+    //TAIL
+    Transform _tailTarget;
+    MyTentacleController _tail;
+    float[] _tailAngles = null;
+    Vector3[] _tailAxis = null;
+    Vector3[] _tailOffset = null;
+    private float _deltaGradient = 0.1f; // Used to simulate gradient (degrees)
+    private float _learningRate = 3.0f; // How much we move depending on the gradient
+    private float _distanceThreshold = 5.0f;
+
+    //LEGS
+    Transform[] _legTargets = null;
+    Transform[] _legRoots = null;
+    Transform[] _legFutureBases = null;
+    MyTentacleController[] _legs = new MyTentacleController[6];
+    bool _startWalk;
+    private List<Vector3[]> _copy;
+    private List<float[]> _distances;
+    private float _legThreshold = 1.5f;
 
     // Start is called before the first frame update
     void Start()
     {
-        /*_originalTaillRotations = new Quaternion[3];
+        /*_originalTaillRotations = new Quaternion[5];
         _originalTaillRotations[0] = tail.rotation;
-        _originalTaillRotations[1] = tail.rotation;
-        _originalTaillRotations[2] = tail.rotation;*/
+        _originalTaillRotations[1] = tail.GetChild(1).rotation;
+        _originalTaillRotations[2] = tail.GetChild(1).GetChild(1).rotation;
+        _originalTaillRotations[3] = tail.GetChild(1).GetChild(1).GetChild(1).rotation;
+        _originalTaillRotations[2] = tail.GetChild(1).GetChild(1).GetChild(1).rotation;*/
         _myController.InitLegs(legs,futureLegBases,legTargets);
         _myController.InitTail(tail);
-        //_scorpionOriginalPosition = this.transform.position;
-        //_ballOriginalPosition = tailTarget.position;
     }
 
     // Update is called once per frame
@@ -59,13 +76,6 @@ public class IK_Scorpion : MonoBehaviour
         
         if (Input.GetKey(KeyCode.Space))
         {
-            /*if (_firstTimePressed)
-            {
-                this.transform.position = _scorpionOriginalPosition;
-                tailTarget.position = _ballOriginalPosition;
-                _firstTimePressed = false;
-            }*/
-
             if (forceSlider.value >= forceSlider.maxValue) _sliderGoUp = false;
             if (forceSlider.value <= forceSlider.minValue) _sliderGoUp = true;
 
@@ -76,7 +86,6 @@ public class IK_Scorpion : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Space))
         {
             StartWalk();
-            //_firstTimePressed = true;
         }
 
         if (animTime < animDuration)
