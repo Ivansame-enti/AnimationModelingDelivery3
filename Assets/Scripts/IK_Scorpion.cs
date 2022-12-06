@@ -93,6 +93,7 @@ public class IK_Scorpion : MonoBehaviour
         {
             _tailTarget = null;
             for (int i = 0; i < _tailBones.Length; i++) _tailBones[i].rotation = _originalTaillRotations[i];
+            _learningRate = forceSlider.value;
             InitTail(tail);
             StartWalk();
         }
