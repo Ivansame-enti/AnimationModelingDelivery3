@@ -1106,6 +1106,7 @@ MonoBehaviour:
   - {fileID: 1581206102}
   forceSlider: {fileID: 1725396510}
   _slideSpeed: 7
+  magnusSlider: {fileID: 1172727220}
 --- !u!4 &263851881 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8005202564104028492, guid: c9ae8800298c5904a805978e2ff06201,
@@ -4844,6 +4845,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1172727219}
   - component: {fileID: 1172727220}
+  - component: {fileID: 1172727221}
   m_Layer: 5
   m_Name: Slider_effect
   m_TagString: Untagged
@@ -4917,13 +4919,25 @@ MonoBehaviour:
   m_FillRect: {fileID: 1476907252}
   m_HandleRect: {fileID: 1652727225}
   m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 700
+  m_MinValue: -1
+  m_MaxValue: 1
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1172727221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1172727218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3a1af935b809b246b9f47897807cbde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1179814126
 GameObject:
   m_ObjectHideFlags: 0
