@@ -200,7 +200,7 @@ public class IK_Scorpion : MonoBehaviour
             if (firstTimeMagnus)
             {
                 float map = Mathf.Lerp(-0.5f, +0.5f, Mathf.InverseLerp(magnusSlider.minValue, magnusSlider.maxValue, magnusSlider.value));
-                Debug.Log(map);
+                //Debug.Log(map);
                 _targetWithMagnus = new Vector3(target.position.x + map, target.position.y, target.position.z);
                 firstTimeMagnus = false;
             }
