@@ -25,6 +25,12 @@ Scripts:
         1.3.- IK_Scorpion, MovingBall
         1.4.- ResetController
 
+    Ejercicio 2:
+        2.1.- MagnusSliderController, IK_Scorpion
+
+    Ejercicio 4:
+        4.1.- IK_Scorpion
+
 --------------------------------------------------------------------------
 
 Explicaciones:
