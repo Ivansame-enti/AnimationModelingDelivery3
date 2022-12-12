@@ -37,6 +37,7 @@ public class IK_Scorpion : MonoBehaviour
     public Slider magnusSlider;
     private Vector3 _targetWithMagnus;
     public bool firstTimeMagnus=true;
+    private float _map;
 
     /***************************************Iks**************************************/
     //TAIL
@@ -199,9 +200,9 @@ public class IK_Scorpion : MonoBehaviour
             //Debug.Log("aaaaaaaaaaaaaa");
             if (firstTimeMagnus)
             {
-                float map = Mathf.Lerp(-0.5f, +0.5f, Mathf.InverseLerp(magnusSlider.minValue, magnusSlider.maxValue, magnusSlider.value));
+                _map = Mathf.Lerp(-0.5f, +0.5f, Mathf.InverseLerp(magnusSlider.minValue, magnusSlider.maxValue, magnusSlider.value));
                 //Debug.Log(map);
-                _targetWithMagnus = new Vector3(target.position.x + map, target.position.y, target.position.z);
+                //_targetWithMagnus = new Vector3(target.position.x + map, target.position.y, target.position.z);
                 firstTimeMagnus = false;
             }
 
@@ -244,6 +245,8 @@ public class IK_Scorpion : MonoBehaviour
     {
         if (_tailTarget != null)
         {
+            _targetWithMagnus = new Vector3(_tailTarget.position.x + _map, _tailTarget.position.y, _tailTarget.position.z);
+            Debug.Log(_map);
             for (int i = 0; i < _tail.Bones.Length; i++)
             {
                 //Debug.Log(_targetWithMagnus.x);
