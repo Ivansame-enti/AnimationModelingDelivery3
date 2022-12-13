@@ -164,9 +164,7 @@ public class IK_tentacles : MonoBehaviour
         NotifyShootIK();
     }
 
-
     #endregion
-
 
     // Start is called before the first frame update
     void Start()
@@ -181,8 +179,6 @@ public class IK_tentacles : MonoBehaviour
         _myController.SwingMin = _swingMin;
 
     }
-
-
 
     // Update is called once per frame
     void Update()
@@ -262,19 +258,19 @@ public class IK_tentacles : MonoBehaviour
             for (int t = 0; t < _tentacles.Length; t++)
             {
 
-                if (_region1b == true && t == 0)
+                if (_region1b == true && t == 0 && stopBall)
                 {
                     ApplyCCD(t, _target);
                 }
-                else if (_region2b == true && t == 1)
+                else if (_region2b == true && t == 1 && stopBall)
                 {
                     ApplyCCD(t, _target);
                 }
-                else if (_region3b == true && t == 2)
+                else if (_region3b == true && t == 2 && stopBall)
                 {
                     ApplyCCD(t, _target);
                 }
-                else if (_region4b == true && t == 3)
+                else if (_region4b == true && t == 3 && stopBall)
                 {
                     ApplyCCD(t, _target);
                 }
@@ -289,21 +285,21 @@ public class IK_tentacles : MonoBehaviour
 
         for (int t = 0; t < _tentacles.Length; t++)
         {
-            if (_region1b == true && t == 0)
+            if (_region1b == true && t == 0 && stopBall)
             {
                 ResetTentacle(t, _target);
 
             }
-            else if (_region2b == true && t == 1)
+            else if (_region2b == true && t == 1 && stopBall)
             {
                 ResetTentacle(t, _target);
             }
-            else if (_region3b == true && t == 2)
+            else if (_region3b == true && t == 2 && stopBall)
             {
                 ResetTentacle(t, _target);
 
             }
-            else if (_region4b == true && t == 3)
+            else if (_region4b == true && t == 3 && stopBall)
             {
                 ResetTentacle(t, _target);
 
@@ -324,6 +320,7 @@ public class IK_tentacles : MonoBehaviour
             _region3b = false;
             _region4b = false;
             _timer = 0f;
+            stopBall = !stopBall;
         }
         else
         {
