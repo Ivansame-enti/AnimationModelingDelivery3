@@ -49,6 +49,7 @@ public class IK_Scorpion : MonoBehaviour
     private float _deltaGradient = 0.1f; // Used to simulate gradient (degrees)
     private float _learningRate = 3.0f; // How much we move depending on the gradient
     private float _distanceThreshold = 4.0f;
+    private Transform _endEffector;
 
     //LEGS
     Transform[] _legTargets = null;
@@ -70,7 +71,7 @@ public class IK_Scorpion : MonoBehaviour
         _tailBones[2] = _tailBones[1].GetChild(1);
         _tailBones[3] = _tailBones[2].GetChild(1);
         _tailBones[4] = _tailBones[3].GetChild(1);
-
+        _endEffector = _tailBones[4];
         for (int i = 0; i < _tailBones.Length; i++) _originalTaillRotations[i] = _tailBones[i].rotation;
 
         InitLegs(legs,futureLegBases,legTargets);
@@ -195,7 +196,7 @@ public class IK_Scorpion : MonoBehaviour
     //Check when to start the animation towards target and implement Gradient Descent method to move the joints.
     public void NotifyTailTargetIK(Transform target)
     {
-        Debug.Log("aaaaaaaaaaaaaa");
+        //Debug.Log("aaaaaaaaaaaaaa");
         if (Vector3.Distance(_tail.Bones[_tail.Bones.Length - 1].position, target.position) < _distanceThreshold)
         {
             //Debug.Log("aaaaaaaaaaaaaa");
@@ -268,9 +269,9 @@ public class IK_Scorpion : MonoBehaviour
     {
         float gradient = 0;
         float angle = Solution[i];
-        float p = DistanceFromTarget(target, Solution) + gradientError(target, Solution);
+        float p = DistanceFromTarget(target, Solution) + AngleDiff(target, Solution);
         Solution[i] += delta;
-        float pDelta = DistanceFromTarget(target, Solution) + gradientError(target, Solution);
+        float pDelta = DistanceFromTarget(target, Solution) + AngleDiff(target, Solution);
         gradient = (pDelta - p) / delta;
         Solution[i] = angle;
         return gradient;
@@ -279,13 +280,15 @@ public class IK_Scorpion : MonoBehaviour
     private float DistanceFromTarget(Vector3 target, float[] Solution)
     {
         Vector3 point = ForwardKinematics(Solution);
-
+        //Debug.Log(Vector3.Distance(point, target));
         return Vector3.Distance(point, target);
     }
 
-    private float gradientError(Vector3 target, float[] Solution)
+    private float AngleDiff(Vector3 target, float[] Solution)
     {
-        return 0f;
+        //Debug.Log(Mathf.Abs(Quaternion.Angle(_endEffector.rotation, _tailTarget.rotation)));
+        //Debug.Log(_endEffector);
+        return Mathf.Abs(Quaternion.Angle(_endEffector.rotation, _tailTarget.rotation));
     }
 
     public PositionRotation ForwardKinematics(float[] Solution)
