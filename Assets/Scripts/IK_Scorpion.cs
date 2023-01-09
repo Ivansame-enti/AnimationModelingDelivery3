@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using OctopusController;
 using System.Linq;
+using System.Drawing;
+using Color = UnityEngine.Color;
 
 public class IK_Scorpion : MonoBehaviour
 {
@@ -29,6 +31,7 @@ public class IK_Scorpion : MonoBehaviour
     public Transform[] legs;
     public Transform[] legTargets;
     public Transform[] futureLegBases;
+    public Transform[] legRayCast;
 
     public Slider forceSlider;
     private bool _sliderGoUp=true;
@@ -54,11 +57,26 @@ public class IK_Scorpion : MonoBehaviour
     Transform[] _legTargets = null;
     Transform[] _legRoots = null;
     Transform[] _legFutureBases = null;
+    Transform[] _raycastPos = null;
     MyTentacleController[] _legs = new MyTentacleController[6];
     bool _startWalk;
     private List<Vector3[]> _copy;
     private List<float[]> _distances;
-    private float _legThreshold = 1.5f;
+    public float _legThreshold;
+    public float lerpDuration;
+    private float elapsedTime;
+    float[] complete = null;
+    private bool[] limit;
+    private Vector3[] initialPos = null;
+    private Vector3[] finalPos = null;
+    private Transform copy2;
+
+    public float height = 5;
+    Ray[] ray;
+    RaycastHit[] hit;
+    Ray[] rayDown;
+    RaycastHit[] hitDown;
+    private bool[] impact;
 
     // Start is called before the first frame update
     void Start()
@@ -73,13 +91,44 @@ public class IK_Scorpion : MonoBehaviour
 
         for (int i = 0; i < _tailBones.Length; i++) _originalTaillRotations[i] = _tailBones[i].rotation;
 
-        InitLegs(legs,futureLegBases,legTargets);
+        InitLegs(legs,futureLegBases,legTargets,legRayCast);
         InitTail(tail);
+        ray = new Ray[legs.Length];
+        hit = new RaycastHit[legs.Length];
+        rayDown = new Ray[legs.Length];
+        hitDown = new RaycastHit[legs.Length];
+        limit = new bool[legs.Length];
+        impact = new bool[legs.Length];
+        
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+        for(int i = 0; i < legs.Length; i++)
+        {
+
+
+            rayDown[i] = new Ray(legRayCast[i].transform.position, -Vector3.up);
+            Debug.DrawRay(legRayCast[i].transform.position, -Vector3.up * height);
+            if (Physics.Raycast(rayDown[i], out hitDown[i]))
+            {
+                if (hitDown[i].collider.tag == "Suelo")
+                {
+                    if (hitDown[i].distance > 0.01)
+                    {
+                        futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, hitDown[i].point.y, futureLegBases[i].transform.position.z);
+                        Debug.Log(hitDown[1].distance);
+                    }
+                    
+                }
+            }
+
+        }
+
+
+  
         if(animPlaying)
             animTime += Time.deltaTime;
 
@@ -136,14 +185,19 @@ public class IK_Scorpion : MonoBehaviour
     }
 
     /*****************************IKs**********************************/
-    public void InitLegs(Transform[] LegRoots, Transform[] LegFutureBases, Transform[] LegTargets)
+    public void InitLegs(Transform[] LegRoots, Transform[] LegFutureBases, Transform[] LegTargets, Transform[] LegRayCast)
     {
         _legs = new MyTentacleController[LegRoots.Length];
         _legRoots = new Transform[LegRoots.Length];
         _legTargets = new Transform[LegTargets.Length];
         _legFutureBases = new Transform[LegFutureBases.Length];
+        _raycastPos = new Transform[legs.Length];
         _copy = new List<Vector3[]>();
         _distances = new List<float[]>();
+        complete = new float[LegRoots.Length];
+        elapsedTime = 0;
+        initialPos = new Vector3[LegRoots.Length];
+        finalPos = new Vector3[LegRoots.Length];
 
         //Legs init
         for (int i = 0; i < LegRoots.Length; i++)
@@ -153,9 +207,11 @@ public class IK_Scorpion : MonoBehaviour
             _legRoots[i] = LegRoots[i];
             _legTargets[i] = LegTargets[i];
             _legFutureBases[i] = LegFutureBases[i];
+            _raycastPos[i] = LegRayCast[i];
             _copy.Add(new Vector3[_legs[i].Bones.Length]);
             _distances.Add(new float[_legs[i].Bones.Length]);
-
+            initialPos[i] = _legRoots[i].position;
+            finalPos[i] = _legFutureBases[i].position;
             for (int x = 0; x < _legs[i].Bones.Length; x++)
             {
                 if (x < _legs[i].Bones.Length - 1)
@@ -232,9 +288,22 @@ public class IK_Scorpion : MonoBehaviour
     {
         for (int i = 0; i < _legs.Length; i++)
         {
-            if ((_legFutureBases[i].position - _legRoots[i].position).magnitude > _legThreshold)
+            if ((_legFutureBases[i].position - _legRoots[i].position).magnitude > _legThreshold && limit[i] == false)
             {
-                _legRoots[i].position = _legFutureBases[i].position;
+                limit[i] = true;
+                elapsedTime = 0;
+                initialPos[i] = _legRoots[i].position;
+                finalPos[i] = _legFutureBases[i].position;
+            }
+            if (limit[i] == true)
+            {
+                elapsedTime += Time.deltaTime;
+                //_legRoots[i].position = Vector3.Lerp(initialPos[i], finalPos[i], elapsedTime / lerpDuration);
+                _legRoots[i].position = Vector3.Slerp(initialPos[i], finalPos[i], elapsedTime / lerpDuration);
+                if (elapsedTime >= lerpDuration)
+                {
+                    limit[i] = false;
+                }
             }
         }
 
@@ -246,7 +315,7 @@ public class IK_Scorpion : MonoBehaviour
         if (_tailTarget != null)
         {
             _targetWithMagnus = new Vector3(_tailTarget.position.x + _map, _tailTarget.position.y, _tailTarget.position.z);
-            Debug.Log(_map);
+            //Debug.Log(_map);
             for (int i = 0; i < _tail.Bones.Length; i++)
             {
                 //Debug.Log(_targetWithMagnus.x);
