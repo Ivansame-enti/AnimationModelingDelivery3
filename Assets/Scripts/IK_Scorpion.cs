@@ -9,7 +9,7 @@ using Color = UnityEngine.Color;
 
 public class IK_Scorpion : MonoBehaviour
 {
-    MyScorpionController _myController= new MyScorpionController();
+    MyScorpionController _myController = new MyScorpionController();
 
     public IK_tentacles _myOctopus;
 
@@ -34,12 +34,12 @@ public class IK_Scorpion : MonoBehaviour
     public Transform[] legRayCast;
 
     public Slider forceSlider;
-    private bool _sliderGoUp=true;
+    private bool _sliderGoUp = true;
     public float _slideSpeed = 7f;
 
     public Slider magnusSlider;
     private Vector3 _targetWithMagnus;
-    public bool firstTimeMagnus=true;
+    public bool firstTimeMagnus = true;
     private float _map;
 
     /***************************************Iks**************************************/
@@ -64,7 +64,7 @@ public class IK_Scorpion : MonoBehaviour
     private List<float[]> _distances;
     public float _legThreshold;
     public float lerpDuration;
-    private float elapsedTime;
+    private float elapsedTime, elapsedTime2;
     float[] complete = null;
     private bool[] limit;
     private Vector3[] initialPos = null;
@@ -72,11 +72,13 @@ public class IK_Scorpion : MonoBehaviour
     private Transform copy2;
 
     public float height = 5;
-    Ray[] ray;
-    RaycastHit[] hit;
     Ray[] rayDown;
     RaycastHit[] hitDown;
     private bool[] impact;
+
+    private float y_promedio, y_total;
+    private Transform posicionInicialBody;
+    private Vector3 posicionDeseadaBody, posicionInterpolada,promedio_total, targetDirection;
 
     // Start is called before the first frame update
     void Start()
@@ -91,27 +93,26 @@ public class IK_Scorpion : MonoBehaviour
 
         for (int i = 0; i < _tailBones.Length; i++) _originalTaillRotations[i] = _tailBones[i].rotation;
 
-        InitLegs(legs,futureLegBases,legTargets,legRayCast);
+        InitLegs(legs, futureLegBases, legTargets, legRayCast);
         InitTail(tail);
-        ray = new Ray[legs.Length];
-        hit = new RaycastHit[legs.Length];
         rayDown = new Ray[legs.Length];
         hitDown = new RaycastHit[legs.Length];
         limit = new bool[legs.Length];
         impact = new bool[legs.Length];
-        
+        y_promedio = 0;
         
     }
 
     // Update is called once per frame
     void Update()
     {
-        for(int i = 0; i < legs.Length; i++)
+        y_total = 0;
+        targetDirection = Vector3.zero;
+        for (int i = 0; i < legs.Length; i++)
         {
-
-
+            y_total += _legFutureBases[i].position.y;
             rayDown[i] = new Ray(legRayCast[i].transform.position, -Vector3.up);
-            Debug.DrawRay(legRayCast[i].transform.position, -Vector3.up * height);
+            //Debug.DrawRay(legRayCast[i].transform.position, -Vector3.up * height);
             if (Physics.Raycast(rayDown[i], out hitDown[i]))
             {
                 if (hitDown[i].collider.tag == "Suelo")
@@ -119,27 +120,47 @@ public class IK_Scorpion : MonoBehaviour
                     if (hitDown[i].distance > 0.01)
                     {
                         futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, hitDown[i].point.y, futureLegBases[i].transform.position.z);
-                        Debug.Log(hitDown[1].distance);
+                        //Debug.Log(hitDown[1].distance);
                     }
-                    
+                }
+                if (hitDown[i].collider.tag == "Obstacle")
+                {
+                    if (hitDown[0].distance > 0.01 || hitDown[2].distance > 0.01 || hitDown[4].distance > 0.01)
+                    {
+                        futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, hitDown[i].point.y, futureLegBases[i].transform.position.z);
+                        
+                    }
                 }
             }
-
         }
+        
+       y_promedio = y_total / 6;
+       y_promedio = y_promedio + 0.6f;
+       posicionInicialBody = Body;
+       posicionDeseadaBody = new Vector3(Body.position.x, y_promedio, Body.position.z);
 
+       Body.position = Vector3.Lerp(posicionInicialBody.position, posicionDeseadaBody, lerpDuration);
+        //posicionInterpolada = Vector3.Lerp(posicionInicialBody.position, posicionDeseadaBody, lerpDuration);
 
-  
-        if(animPlaying)
+        //Body.position = posicionInterpolada;
+
+        //targetDirection = (futureLegBases[0].position - futureLegBases[5].position).normalized;
+        //Quaternion rotation = Quaternion.LookRotation(targetDirection);
+        //Body.rotation = rotation;
+
+        //Body.transform.position = new Vector3(Body.transform.position.x, y_promedio, Body.transform.position.z);
+
+        if (animPlaying)
             animTime += Time.deltaTime;
 
         NotifyTailTarget();
-        
+
         if (Input.GetKey(KeyCode.Space))
         {
             if (forceSlider.value >= forceSlider.maxValue) _sliderGoUp = false;
             if (forceSlider.value <= forceSlider.minValue) _sliderGoUp = true;
 
-            if(_sliderGoUp) forceSlider.value += Time.deltaTime * _slideSpeed;
+            if (_sliderGoUp) forceSlider.value += Time.deltaTime * _slideSpeed;
             else forceSlider.value -= Time.deltaTime * _slideSpeed;
         }
 
@@ -155,6 +176,7 @@ public class IK_Scorpion : MonoBehaviour
         if (animTime < animDuration)
         {
             Body.position = Vector3.Lerp(StartPos.position, EndPos.position, animTime / animDuration);
+            Body.position = Vector3.Lerp(posicionInicialBody.position, posicionDeseadaBody, lerpDuration);
         }
         else if (animTime >= animDuration && animPlaying)
         {
@@ -164,7 +186,7 @@ public class IK_Scorpion : MonoBehaviour
 
         UpdateIK();
     }
-    
+
     //Function to send the tail target transform to the dll
     public void NotifyTailTarget()
     {
@@ -276,7 +298,7 @@ public class IK_Scorpion : MonoBehaviour
     //Create the apropiate animations and update the IK from the legs and tail
     public void UpdateIK()
     {
-        if(_tailTarget!=null) updateTail();
+        if (_tailTarget != null) updateTail();
         if (_startWalk)
         {
             updateLegs();
@@ -299,7 +321,7 @@ public class IK_Scorpion : MonoBehaviour
             {
                 elapsedTime += Time.deltaTime;
                 //_legRoots[i].position = Vector3.Lerp(initialPos[i], finalPos[i], elapsedTime / lerpDuration);
-                _legRoots[i].position = Vector3.Slerp(initialPos[i], finalPos[i], elapsedTime / lerpDuration);
+                _legRoots[i].position = Vector3.Lerp(initialPos[i], finalPos[i], elapsedTime / lerpDuration);
                 if (elapsedTime >= lerpDuration)
                 {
                     limit[i] = false;
