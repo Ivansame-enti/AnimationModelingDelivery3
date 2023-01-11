@@ -58,6 +58,7 @@ public class IK_Scorpion : MonoBehaviour
     Transform[] _legRoots = null;
     Transform[] _legFutureBases = null;
     Transform[] _raycastPos = null;
+    Vector3[] _finalPosY = null;
     MyTentacleController[] _legs = new MyTentacleController[6];
     bool _startWalk;
     private List<Vector3[]> _copy;
@@ -68,7 +69,7 @@ public class IK_Scorpion : MonoBehaviour
     float[] complete = null;
     private bool[] limit;
     private Vector3[] initialPos = null;
-    private Vector3[] finalPos = null;
+    private Vector3[] finalPos = null,finalPosY;
     private Transform copy2;
 
     public float height = 5;
@@ -107,7 +108,6 @@ public class IK_Scorpion : MonoBehaviour
     void Update()
     {
         y_total = 0;
-        targetDirection = Vector3.zero;
         for (int i = 0; i < legs.Length; i++)
         {
             y_total += _legFutureBases[i].position.y;
@@ -128,7 +128,15 @@ public class IK_Scorpion : MonoBehaviour
                     if (hitDown[0].distance > 0.01 || hitDown[2].distance > 0.01 || hitDown[4].distance > 0.01)
                     {
                         futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, hitDown[i].point.y, futureLegBases[i].transform.position.z);
-                        
+                        /*
+                        Vector3 diferenciaIzq = futureLegBases[0].position - futureLegBases[2].position;
+                        Vector3 diferenciaDer = futureLegBases[1].position - futureLegBases[3].position;
+                        Vector3 diferenciaTrasera = futureLegBases[4].position - futureLegBases[5].position;
+                        Vector3 Cross = Vector3.Cross(diferenciaDer, diferenciaTrasera).normalized;
+                        Vector3 Cross2 = Vector3.Cross(diferenciaIzq, diferenciaDer).normalized;
+
+                        Body.transform.Rotate(Cross2,Space.World);
+                        */
                     }
                 }
             }
@@ -144,11 +152,9 @@ public class IK_Scorpion : MonoBehaviour
 
         //Body.position = posicionInterpolada;
 
-        //targetDirection = (futureLegBases[0].position - futureLegBases[5].position).normalized;
-        //Quaternion rotation = Quaternion.LookRotation(targetDirection);
-        //Body.rotation = rotation;
+        
 
-        //Body.transform.position = new Vector3(Body.transform.position.x, y_promedio, Body.transform.position.z);
+
 
         if (animPlaying)
             animTime += Time.deltaTime;
@@ -216,10 +222,12 @@ public class IK_Scorpion : MonoBehaviour
         _raycastPos = new Transform[legs.Length];
         _copy = new List<Vector3[]>();
         _distances = new List<float[]>();
+        _finalPosY = new Vector3[LegRoots.Length];
         complete = new float[LegRoots.Length];
         elapsedTime = 0;
         initialPos = new Vector3[LegRoots.Length];
         finalPos = new Vector3[LegRoots.Length];
+        finalPosY = new Vector3[LegRoots.Length];
 
         //Legs init
         for (int i = 0; i < LegRoots.Length; i++)
@@ -234,6 +242,7 @@ public class IK_Scorpion : MonoBehaviour
             _distances.Add(new float[_legs[i].Bones.Length]);
             initialPos[i] = _legRoots[i].position;
             finalPos[i] = _legFutureBases[i].position;
+            _finalPosY[i] = new Vector3(_legFutureBases[i].position.x, _legFutureBases[i].position.y + 0.5f, _legFutureBases[i].position.z);
             for (int x = 0; x < _legs[i].Bones.Length; x++)
             {
                 if (x < _legs[i].Bones.Length - 1)
@@ -314,23 +323,36 @@ public class IK_Scorpion : MonoBehaviour
             {
                 limit[i] = true;
                 elapsedTime = 0;
+                elapsedTime2 = 0;
                 initialPos[i] = _legRoots[i].position;
                 finalPos[i] = _legFutureBases[i].position;
+                finalPosY[i] = new Vector3(_legFutureBases[i].position.x, _legFutureBases[i].position.y + 0.5f, _legFutureBases[i].position.z);
+
             }
             if (limit[i] == true)
             {
                 elapsedTime += Time.deltaTime;
                 //_legRoots[i].position = Vector3.Lerp(initialPos[i], finalPos[i], elapsedTime / lerpDuration);
-                _legRoots[i].position = Vector3.Lerp(initialPos[i], finalPos[i], elapsedTime / lerpDuration);
+
+                
+                //_legRoots[i].position = new Vector3(Mathf.Lerp(initialPos[i].x, finalPos[i].x, elapsedTime / lerpDuration), Mathf.Lerp(initialPos[i].y, finalPosY[i].y, elapsedTime / lerpDuration), Mathf.Lerp(initialPos[i].z, finalPos[i].z, elapsedTime / lerpDuration));
+                _legRoots[i].position = Vector3.Lerp(initialPos[i], finalPosY[i], elapsedTime / lerpDuration);
+
                 if (elapsedTime >= lerpDuration)
                 {
-                    limit[i] = false;
+                    elapsedTime2 += Time.deltaTime;
+                    _legRoots[i].position = Vector3.Lerp(finalPosY[i], finalPos[i], elapsedTime / lerpDuration);
+                    if(elapsedTime2 >= lerpDuration)
+                    {
+                        limit[i] = false;
+                    }
+                    
                 }
             }
         }
-
+        Debug.Log(initialPos[0].y);
     }
-
+    
     //Implement Gradient Descent method to move tail if necessary
     private void updateTail()
     {
