@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MovingBall : MonoBehaviour
 {
+    private float GRAVITY = -1f;
+    private float MASS = 1f;
     [SerializeField]
     IK_tentacles _myOctopus;
 
@@ -13,19 +16,25 @@ public class MovingBall : MonoBehaviour
     private float _movementSpeed = 10f;
 
     public Transform ballTarget;
-    private bool _shootBall = false;
-    public Vector3 ballSpeed = new Vector3(5,0,0);
+    public bool shootBall = false;
+    public float ballSpeed=10f;
+    public Vector3 movementEulerSpeed;
+    private Vector3 _acceleration;
     private Vector3 ballDirection;
-    private float radius = 0.5f;
-    private float airResistance = 0.8f;
-    private Vector3 angularVelocity =new Vector3(5,5,0);
     private Vector3 ballDirectionMagnus;
-    private float Magnitude1,Magnitude2,Magnitude3;
-    private Vector3 Magnitude;
+
+    private float _timer;
+    private float _stopForce=2;
+    float velocidadAngular;
+
+    public Slider forceSlider;
+    public Slider magnusSlider;
     // Start is called before the first frame update
     void Start()
     {
-
+        _acceleration = new Vector3(0, GRAVITY * MASS, 0);
+        _timer = 0;
+        velocidadAngular = 1;
     }
 
     // Update is called once per frame
@@ -38,29 +47,33 @@ public class MovingBall : MonoBehaviour
         //get the Input from Vertical axis
         float verticalInput = Input.GetAxis("Vertical");
 
-        //update the position
-        transform.position = transform.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0);
+        ballTarget.position = ballTarget.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0); //Movemos el target en vez de la pelota
 
+        if (shootBall)
+        {
+            EulerStep();
+        }
     }
 
-    private void FixedUpdate()
+    private void EulerStep()
     {
-        if (_shootBall) {
-            GetComponent<Rigidbody>().AddForce(ballDirection.normalized * Magnitude.x);
-            GetComponent<Rigidbody>().AddForce(ballDirection.normalized * ballSpeed.x);
-          
-        };
+        ballDirectionMagnus = Vector3.Cross(new Vector3(0, velocidadAngular, 0), ballDirection.normalized * ballSpeed);
+
+        float S = magnusSlider.value;
+        Vector3 MagnusForce = S * ballDirectionMagnus;
+
+        Vector3 finalForce = MagnusForce + ballDirection.normalized * ballSpeed;
+
+        movementEulerSpeed = movementEulerSpeed + finalForce + _acceleration * Time.deltaTime;
+        transform.position = (transform.position + movementEulerSpeed * Time.deltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         _myOctopus.NotifyShoot();
-        _shootBall = true;
+        shootBall = true;
+        ballSpeed = forceSlider.value;
         ballDirection = ballTarget.position - this.transform.position;
-        ballDirectionMagnus = Vector3.Cross(angularVelocity,ballSpeed);
-        Magnitude1 = ballDirectionMagnus.x * airResistance;
-        Magnitude2 = ballDirectionMagnus.y * airResistance;
-        Magnitude3 = ballDirectionMagnus.z * airResistance;
-        Magnitude = new Vector3(Magnitude1, Magnitude2, Magnitude3);
+        movementEulerSpeed = ballDirection.normalized * ballSpeed;
     }
 }
