@@ -47,11 +47,7 @@ public class MovingBall : MonoBehaviour
 
         if (shootBall)
         {
-            Debug.Log("sad");
             EulerStep();
-            //ApplyMagnusEffect(_ballRotation);
-            //transform.Rotate(new Vector3(transform.rotation.x, transform.rotation.y - (acceleration.x * (_movementVelocity.x / 100)), transform.rotation.z));
-
         }
 
     }
