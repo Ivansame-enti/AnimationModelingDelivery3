@@ -183,7 +183,6 @@ public class IK_tentacles : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log(stopBall);
         UpdateTentacles();
 
         if (_updateTwistSwingLimits) {

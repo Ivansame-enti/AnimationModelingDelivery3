@@ -29,8 +29,8 @@ public class ResetController : MonoBehaviour
             //scorpion.position = _scorpionOriginalPosition;
             ikTentacles.stopBall = !ikTentacles.stopBall;
             ball.position = _ballOriginalPosition;
-            ball.gameObject.GetComponent<Rigidbody>().AddForce(0, 0, 0);
-            ball.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);
+            ball.GetComponent<MovingBall>().shootBall = false;
+            ball.GetComponent<MovingBall>().movementEulerSpeed = Vector3.zero;
             ballTarget.position = _ballTargetOriginalPosition;
         }
     }

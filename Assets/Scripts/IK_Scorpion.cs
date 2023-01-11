@@ -32,7 +32,7 @@ public class IK_Scorpion : MonoBehaviour
 
     public Slider forceSlider;
     private bool _sliderGoUp=true;
-    public float _slideSpeed = 7f;
+    public float _slideSpeed = 20f;
 
     /***************************************Iks**************************************/
     //TAIL

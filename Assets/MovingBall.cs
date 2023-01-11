@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class MovingBall : MonoBehaviour
 {
+    private float GRAVITY = -1f;
+    private float MASS = 1f;
     [SerializeField]
     IK_tentacles _myOctopus;
 
@@ -14,8 +16,10 @@ public class MovingBall : MonoBehaviour
     private float _movementSpeed = 10f;
 
     public Transform ballTarget;
-    private bool _shootBall = false;
+    public bool shootBall = false;
     public float ballSpeed=10f;
+    public Vector3 movementEulerSpeed;
+    private Vector3 _acceleration;
     private Vector3 ballDirection;
 
     private float _timer;
@@ -25,6 +29,7 @@ public class MovingBall : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _acceleration = new Vector3(0, GRAVITY * MASS, 0);
         _timer = 0;
     }
 
@@ -40,22 +45,29 @@ public class MovingBall : MonoBehaviour
 
         ballTarget.position = ballTarget.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0); //Movemos el target en vez de la pelota
 
+        if (shootBall)
+        {
+            Debug.Log("sad");
+            EulerStep();
+            //ApplyMagnusEffect(_ballRotation);
+            //transform.Rotate(new Vector3(transform.rotation.x, transform.rotation.y - (acceleration.x * (_movementVelocity.x / 100)), transform.rotation.z));
+
+        }
+
     }
 
-    private void FixedUpdate()
+    private void EulerStep()
     {
-        if (_shootBall)
-        {
-            GetComponent<Rigidbody>().AddForce(ballDirection.normalized * ballSpeed, ForceMode.Impulse);
-            _shootBall = false;
-        }
+        movementEulerSpeed = movementEulerSpeed + _acceleration * Time.deltaTime;
+        transform.position = (transform.position + movementEulerSpeed * Time.deltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         _myOctopus.NotifyShoot();
-        _shootBall = true;
+        shootBall = true;
         ballSpeed = forceSlider.value;
         ballDirection = ballTarget.position - this.transform.position;
+        movementEulerSpeed = ballDirection.normalized * ballSpeed;
     }
 }
