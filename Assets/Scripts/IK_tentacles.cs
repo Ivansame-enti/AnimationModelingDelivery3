@@ -148,7 +148,7 @@ public class IK_tentacles : MonoBehaviour
 
     /*******************************************************/
     
-    private bool stopBall = true;
+    public bool stopBall = true; //Bool que indica si tiene que parar la pelota o no
 
     #region public methods
 
@@ -320,7 +320,7 @@ public class IK_tentacles : MonoBehaviour
             _region3b = false;
             _region4b = false;
             _timer = 0f;
-            stopBall = !stopBall;
+            //stopBall = !stopBall;
         }
         else
         {
