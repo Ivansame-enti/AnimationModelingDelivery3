@@ -38,18 +38,7 @@ public class MovingBall : MonoBehaviour
         //get the Input from Vertical axis
         float verticalInput = Input.GetAxis("Vertical");
 
-        //update the position
-        transform.position = transform.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0);
-
-        /*if (_shootBall)
-        {
-            if (_timer >= _stopForce)
-            {
-                _timer = 0;
-                _shootBall = false;
-            }
-            else _timer += Time.deltaTime;
-        }*/
+        ballTarget.position = ballTarget.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0); //Movemos el target en vez de la pelota
 
     }
 

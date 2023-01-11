@@ -7,7 +7,7 @@ public class ResetController : MonoBehaviour
 {
     public Slider forceSlider; 
     public Transform scorpion, ball, ballTarget;
-
+    public IK_tentacles ikTentacles;
     private Vector3 _scorpionOriginalPosition, _ballOriginalPosition, _ballTargetOriginalPosition;
     private IK_Scorpion _scorpionScript;
     // Start is called before the first frame update
@@ -27,6 +27,7 @@ public class ResetController : MonoBehaviour
             forceSlider.value = 0;
             _scorpionScript.animTime = 0;
             //scorpion.position = _scorpionOriginalPosition;
+            ikTentacles.stopBall = !ikTentacles.stopBall;
             ball.position = _ballOriginalPosition;
             ball.gameObject.GetComponent<Rigidbody>().AddForce(0, 0, 0);
             ball.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(0,0,0);

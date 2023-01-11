@@ -20,7 +20,7 @@ Controles:
 
 Scripts:
     Ejercicio 1:
-        1.1.- IK_tentacles
+        1.1.- IK_tentacles y RestartController
         1.2.- MovingBall
         1.3.- IK_Scorpion, MovingBall
         1.4.- ResetController

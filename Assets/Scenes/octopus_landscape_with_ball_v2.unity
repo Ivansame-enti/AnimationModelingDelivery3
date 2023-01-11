@@ -1186,6 +1186,7 @@ MonoBehaviour:
   _cos: []
   _mtries: 10
   _tries: 0
+  stopBall: 1
 --- !u!1 &319744859
 GameObject:
   m_ObjectHideFlags: 0
@@ -1254,6 +1255,7 @@ MonoBehaviour:
   _cos: []
   _mtries: 10
   _tries: 0
+  stopBall: 1
 --- !u!1001 &344278853
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5177,6 +5179,7 @@ MonoBehaviour:
   _cos: []
   _mtries: 10
   _tries: 0
+  stopBall: 1
 --- !u!1001 &1380445180
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5887,6 +5890,7 @@ MonoBehaviour:
   scorpion: {fileID: 263851881}
   ball: {fileID: 1938829484}
   ballTarget: {fileID: 1418656078}
+  ikTentacles: {fileID: 310279045}
 --- !u!4 &1649569452
 Transform:
   m_ObjectHideFlags: 0
@@ -6811,7 +6815,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -127.07
+      value: -124.56
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalPosition.y
