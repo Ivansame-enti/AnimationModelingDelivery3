@@ -105,15 +105,18 @@ public class MovingBall : MonoBehaviour
         Vector3 rotationVelocity = Vector3.Cross(movementEulerSpeed, radiusVector) / (ballRadius * ballRadius*5);// CALCULAMOS LA VELOCIDAD DE ROTACION
         ballDirectionMagnus = Vector3.Cross(rotationVelocity, ballDirection.normalized);
 
-      
+
         //Vector3 MagnusForce = S * ballDirectionMagnus;
 
         //Vector3 finalForce = MagnusForce + ballDirection.normalized * ballSpeed;
-
+        if (magnusCoefficient <= 0)
+        {
+            ballDirectionMagnus = ballDirectionMagnus * -1;
+        }
         magnusForce = magnusCoefficient * ballDirectionMagnus;
         Debug.Log(magnusForce);
 
-        movementEulerSpeed = movementEulerSpeed + magnusForce + _acceleration * Time.deltaTime;  //ALELUYA
+        movementEulerSpeed = movementEulerSpeed + magnusForce + _acceleration * Time.deltaTime;  //ALELUYA //SI MAGNUS POSITIVO EFECTO A LA DERECHA SI ES NEGATIVO EFECTO A LA DERECHA, ESTO DEBERIA CAMBIAR SEGUNN SI LA ROTTAION VELOCITy ES POSITIVA O NOEGATIVA
         transform.position = (transform.position + movementEulerSpeed * Time.deltaTime);
     }
 
