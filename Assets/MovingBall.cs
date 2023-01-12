@@ -33,7 +33,7 @@ public class MovingBall : MonoBehaviour
 
     public Slider forceSlider;
     public Slider magnusSlider;
-
+    private float ballRadius = 1;
     private bool showArrows=false;
     public GameObject greyArrow;
     //public GameObject blueArrow;
@@ -99,16 +99,21 @@ public class MovingBall : MonoBehaviour
 
     private void EulerStep()
     {
-        //ballDirectionMagnus = Vector3.Cross(new Vector3(0, velocidadAngular, 0), ballDirection.normalized * ballSpeed);
-
+        //
         float magnusCoefficient = magnusSlider.value;
+        Vector3 radiusVector = hitPoint - transform.position;  //CALCULAMOS EL VECTOR DEL CENTRO DE LA BOLA A DONDE HITEEMOS
+        Vector3 rotationVelocity = Vector3.Cross(movementEulerSpeed, radiusVector) / (ballRadius * ballRadius*5);// CALCULAMOS LA VELOCIDAD DE ROTACION
+        ballDirectionMagnus = Vector3.Cross(rotationVelocity, ballDirection.normalized);
+
+      
         //Vector3 MagnusForce = S * ballDirectionMagnus;
 
         //Vector3 finalForce = MagnusForce + ballDirection.normalized * ballSpeed;
 
-        magnusForce = magnusCoefficient * Vector3.Cross(angularVelocity, movementEulerSpeed);
+        magnusForce = magnusCoefficient * ballDirectionMagnus;
+        Debug.Log(magnusForce);
 
-        movementEulerSpeed = movementEulerSpeed /*+ magnusForce*/ + _acceleration * Time.deltaTime;
+        movementEulerSpeed = movementEulerSpeed + magnusForce + _acceleration * Time.deltaTime;  //ALELUYA
         transform.position = (transform.position + movementEulerSpeed * Time.deltaTime);
     }
 

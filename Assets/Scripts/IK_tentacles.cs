@@ -93,10 +93,10 @@ public class IK_tentacles : MonoBehaviour
     Transform[] _randomTargets;
 
     MyOctopusController _myController = new MyOctopusController();
-    
+
     [Header("Exercise 3")]
     [SerializeField, Range(0, 360)]
-    float _twistMin ;
+    float _twistMin;
 
     [SerializeField, Range(0, 360)]
     float _twistMax;
@@ -111,7 +111,7 @@ public class IK_tentacles : MonoBehaviour
     bool _updateTwistSwingLimits = false;
 
     [SerializeField]
-    float TwistMin{set{ _myController.TwistMin = value; }}
+    float TwistMin { set { _myController.TwistMin = value; } }
 
 
     /*****************Inverse Kinematics********************/
@@ -147,7 +147,7 @@ public class IK_tentacles : MonoBehaviour
     #region public methods
 
     /*******************************************************/
-    
+
     public bool stopBall = true; //Bool que indica si tiene que parar la pelota o no
 
     #region public methods
@@ -169,7 +169,7 @@ public class IK_tentacles : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
         _myController.TestLogging(gameObject.name);
         Init(_tentaclesOriginal, _randomTargets);
 
@@ -185,7 +185,8 @@ public class IK_tentacles : MonoBehaviour
     {
         UpdateTentacles();
 
-        if (_updateTwistSwingLimits) {
+        if (_updateTwistSwingLimits)
+        {
             _myController.TwistMax = _twistMax;
             _myController.TwistMin = _twistMin;
             _myController.SwingMax = _swingMax;
@@ -356,6 +357,7 @@ public class IK_tentacles : MonoBehaviour
         {
             for (int i = _tentacles[numeroTentaculo].Bones.Length - 2; i >= 0; i--)
             {
+                // transform.LookAt(camera);
                 Vector3 r1 = (_tentacles[numeroTentaculo].Bones[_tentacles[numeroTentaculo].Bones.Length - 2].transform.position - _tentacles[numeroTentaculo].Bones[i].transform.position).normalized;
                 Vector3 r2 = (targetPosT.transform.position - _tentacles[numeroTentaculo].Bones[i].transform.position).normalized;
 
@@ -374,15 +376,46 @@ public class IK_tentacles : MonoBehaviour
 
                 }
                 _theta[i] = (180 / Mathf.PI) * _theta[i];
-                if (_theta[i] > 0.1)
-                {
-                    _tentacles[numeroTentaculo].Bones[i].transform.Rotate(axis, _theta[i], Space.World);
-                }
+
+
+                //  if (_theta[i] > 0.1)
+                // {
+
+                _theta[i] = Mathf.Clamp(_theta[i], 1, 2);
+
+                Debug.Log(_theta[i]);
+
+                // int twist = 0;
+
+
+
+                //  _tentacles[numeroTentaculo].Bones[i].transform.Rotate(axis, _theta[i], Space.World);
+
+                _tentacles[numeroTentaculo].Bones[i].transform.Rotate(axis, _theta[i], Space.World);
+
+                //_tentacles[numeroTentaculo].Bones[i].transform.rotation.eulerAngles
+
+                //  bones[boneIndex].rotation = Quaternion.Lerp(bones[boneIndex].rotation, targetRotation, weight); // aplicar rotación con peso de IK
+
+                float lerpWeight = 0;  //MOVER CON LERP, SPOILER NOVA
+                float timeToReachTarget = 5f;
+                // for (int h = _tentacles[numeroTentaculo].Bones.Length - 2; h >= 0; h--)
+                //  {
+                //Vector3 newPosition = Vector3.Lerp(_tentacles[numeroTentaculo].Bones[numeroTentaculo].transform.position, targetPosT.transform.position, lerpWeight);
+                //  Vector3 newPosition = Vector3.Lerp(_tentacles[numeroTentaculo].Bones[i].transform.position, targetPosT.transform.position, lerpWeight);
+                //   _tentacles[numeroTentaculo].Bones[numeroTentaculo].transform.position = newPosition;
+                //  lerpWeight += Time.deltaTime / timeToReachTarget;
+                //  }
+                // }
+
+
+
+
 
             }
             _tries++;
         }
+        #endregion
+        /*******************************************************************************************************************************************/
     }
-    #endregion
-    /*******************************************************************************************************************************************/
 }
