@@ -41,7 +41,7 @@ public class IK_Scorpion : MonoBehaviour
 
     /***************************************Iks**************************************/
     //TAIL
-    Transform _tailTarget;
+    public Transform _tailTarget;
     MyTentacleController _tail;
     float[] _tailAngles = null;
     Vector3[] _tailAxis = null;

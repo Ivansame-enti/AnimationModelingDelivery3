@@ -26,7 +26,10 @@ Scripts:
         1.4.- ResetController (en el objeto Restart de la escena)
 
     Ejercicio 2:
-        2.1.- MagnusSliderController, IK_Scorpion
+        2.1.- MagnusSliderController (En el objeto slider_force estan los valores que puede tomar), IK_Scorpion
+        2.2.- MovingBall
+        2.3.- MovingBall
+        2.4.- MovingBall
 
     Ejercicio 4:
         4.1.- IK_Scorpion
@@ -34,6 +37,6 @@ Scripts:
 --------------------------------------------------------------------------
 
 Explicaciones:
-    1.5.- Se ha utilizado Euler Steps para calcular la trayectoria de la pelota hacia el target. En este, se suman la fuerza que recibe del golpe multiplicada por la dirección normalizada, más la aceleración (la cual es de -1 de gravedad (para que esta no afecte demasiado y acabe llegando más o menos al target indicado, y la masa de la pelota que es de 1) multiplicada por el tiempo.
+    1.5.- Se ha utilizado Euler Steps para calcular la trayectoria de la pelota hacia el target. En este, se suman la fuerza que recibe del golpe multiplicada por la dirección normalizada hacia el target, esto sumado a la aceleración (la cual es de -9.81 de gravedad (para que esta no afecte demasiado y acabe llegando más o menos al target indicado, y la masa de la pelota que es de 1) multiplicada por el tiempo.
 
 --------------------------------------------------------------------------
