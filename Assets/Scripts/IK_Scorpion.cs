@@ -7,10 +7,6 @@ using System.Linq;
 
 public class IK_Scorpion : MonoBehaviour
 {
-    MyScorpionController _myController= new MyScorpionController();
-
-    public IK_tentacles _myOctopus;
-
     [Header("Body")]
     public float animTime;
     public float animDuration = 5;
@@ -48,7 +44,8 @@ public class IK_Scorpion : MonoBehaviour
     Vector3[] _tailOffset = null;
     private float _deltaGradient = 0.1f; // Used to simulate gradient (degrees)
     private float _learningRate = 3.0f; // How much we move depending on the gradient
-    private float _distanceThreshold = 3.0f;
+    private float _distanceThreshold = 2.0f;
+    private Transform _endEffector;
 
     //LEGS
     Transform[] _legTargets = null;
@@ -60,6 +57,12 @@ public class IK_Scorpion : MonoBehaviour
     private List<float[]> _distances;
     private float _legThreshold = 1.5f;
 
+    [SerializeField]
+    private float _distanceWeight;
+
+    [SerializeField]
+    private float _angleWeight;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -70,7 +73,7 @@ public class IK_Scorpion : MonoBehaviour
         _tailBones[2] = _tailBones[1].GetChild(1);
         _tailBones[3] = _tailBones[2].GetChild(1);
         _tailBones[4] = _tailBones[3].GetChild(1);
-
+        _endEffector = _tailBones[4];
         for (int i = 0; i < _tailBones.Length; i++) _originalTaillRotations[i] = _tailBones[i].rotation;
 
         InitLegs(legs,futureLegBases,legTargets);
@@ -244,7 +247,6 @@ public class IK_Scorpion : MonoBehaviour
             _targetWithMagnus = new Vector3(_tailTarget.position.x + _map, _tailTarget.position.y, _tailTarget.position.z);
             for (int i = 0; i < _tail.Bones.Length; i++)
             {
-                //Debug.Log(_targetWithMagnus.x);
                 float gradient = CalculateGradient(_targetWithMagnus, _tailAngles, i, _deltaGradient);
                 _tailAngles[i] -= _learningRate * gradient;
             }
@@ -262,9 +264,9 @@ public class IK_Scorpion : MonoBehaviour
     {
         float gradient = 0;
         float angle = Solution[i];
-        float p = DistanceFromTarget(target, Solution);
+        float p = DistanceFromTarget(target, Solution) * _distanceWeight + AngleDiff() * _angleWeight;
         Solution[i] += delta;
-        float pDelta = DistanceFromTarget(target, Solution);
+        float pDelta = DistanceFromTarget(target, Solution) * _distanceWeight + AngleDiff() * _angleWeight;
         gradient = (pDelta - p) / delta;
         Solution[i] = angle;
         return gradient;
@@ -274,6 +276,11 @@ public class IK_Scorpion : MonoBehaviour
     {
         Vector3 point = ForwardKinematics(Solution);
         return Vector3.Distance(point, target);
+    }
+
+    private float AngleDiff()
+    {
+        return Mathf.Abs(Quaternion.Angle(_endEffector.rotation, _tailTarget.rotation)/180);
     }
 
     public PositionRotation ForwardKinematics(float[] Solution)
@@ -294,7 +301,7 @@ public class IK_Scorpion : MonoBehaviour
         return new PositionRotation(prevPoint, rotation);
     }
 
-    //TODO: implement fabrik method to move legs 
+    //Implement fabrik method to move legs 
     private void updateLegs()
     {
         for (int i = 0; i < _legs.Length; i++)

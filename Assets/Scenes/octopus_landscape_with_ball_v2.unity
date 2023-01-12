@@ -1075,7 +1075,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27f152fca6933ad439214f8bce62898a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _myOctopus: {fileID: 0}
   animTime: 0
   animDuration: 5
   Body: {fileID: 8005202565346199705}
@@ -1108,6 +1107,8 @@ MonoBehaviour:
   _slideSpeed: 20
   magnusSlider: {fileID: 1172727220}
   firstTimeMagnus: 1
+  _distanceWeight: 1
+  _angleWeight: 10000
 --- !u!4 &263851881 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8005202564104028492, guid: c9ae8800298c5904a805978e2ff06201,
@@ -6368,10 +6369,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 362755499}
   m_HandleRect: {fileID: 1133702887}
   m_Direction: 0
-  m_MinValue: 15
+  m_MinValue: 5
   m_MaxValue: 40
   m_WholeNumbers: 0
-  m_Value: 15
+  m_Value: 5
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -6842,23 +6843,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -0.5735764
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.8191521
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 70f145abed0b4ae48acf34cbafba0570, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -6925,11 +6926,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1938829479}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1f3e5caa63542e40b6fccc8c030c857, type: 3}
+  m_Script: {fileID: 11500000, guid: 5e65802b5e83d6744ab85fd0cf42466e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 100
+  ForwardX: 0
+  ForwardY: 1
+  ForwardZ: 0
+  ReverseX: 0
+  ReverseY: 0
+  ReverseZ: 0
 --- !u!4 &1946850105 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7726022311939767, guid: d439f53ec8b4d5c4d9b801d4b27cd89c,

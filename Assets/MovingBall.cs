@@ -36,7 +36,7 @@ public class MovingBall : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.rotation = Quaternion.identity;
+        //transform.rotation = Quaternion.identity;
 
         //get the Input from Horizontal axis
         float horizontalInput = Input.GetAxis("Horizontal");
