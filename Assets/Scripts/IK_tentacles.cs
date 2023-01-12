@@ -374,10 +374,16 @@ public class IK_tentacles : MonoBehaviour
 
                 }
                 _theta[i] = (180 / Mathf.PI) * _theta[i];
-                if (_theta[i] > 0.1)
-                {
-                    _tentacles[numeroTentaculo].Bones[i].transform.Rotate(axis, _theta[i], Space.World);
-                }
+                //if (_theta[i] > 0.1)
+                // {
+
+
+                _theta[i] = Mathf.Clamp(_theta[i], 1, 2);
+
+                Debug.Log(_theta[i]);
+
+                _tentacles[numeroTentaculo].Bones[i].transform.Rotate(axis, _theta[i], Space.World);
+               // }
 
             }
             _tries++;
