@@ -109,7 +109,7 @@ public class MovingBall : MonoBehaviour
         //Vector3 MagnusForce = S * ballDirectionMagnus;
 
         //Vector3 finalForce = MagnusForce + ballDirection.normalized * ballSpeed;
-        if (magnusCoefficient <= 0)
+        if (magnusCoefficient >= 0)
         {
             ballDirectionMagnus = ballDirectionMagnus * -1;
         }

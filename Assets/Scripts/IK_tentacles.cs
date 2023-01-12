@@ -378,12 +378,10 @@ public class IK_tentacles : MonoBehaviour
                 _theta[i] = (180 / Mathf.PI) * _theta[i];
 
 
-                //  if (_theta[i] > 0.1)
-                // {
+                  if (_theta[i] > 0.1)
+                 {
 
-                _theta[i] = Mathf.Clamp(_theta[i], 1, 2);
-
-                Debug.Log(_theta[i]);
+               
 
                 // int twist = 0;
 
@@ -406,7 +404,7 @@ public class IK_tentacles : MonoBehaviour
                 //   _tentacles[numeroTentaculo].Bones[numeroTentaculo].transform.position = newPosition;
                 //  lerpWeight += Time.deltaTime / timeToReachTarget;
                 //  }
-                // }
+                 }
 
 
 
