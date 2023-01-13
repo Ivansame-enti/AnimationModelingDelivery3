@@ -377,8 +377,6 @@ public class IK_tentacles : MonoBehaviour
             for (int i = _tentacles[numeroTentaculo].Bones.Length - 2; i >= 0; i--)
             {
 
-                // transform.LookAt(camera);
-
                 Vector3 r1 = (_tentacles[numeroTentaculo].Bones[_tentacles[numeroTentaculo].Bones.Length - 2].transform.position - _tentacles[numeroTentaculo].Bones[i].transform.position).normalized;
                 Vector3 r2 = (targetPosT.transform.position - _tentacles[numeroTentaculo].Bones[i].transform.position).normalized;
 
@@ -403,12 +401,10 @@ public class IK_tentacles : MonoBehaviour
                 _tentacles[numeroTentaculo].Bones[i].transform.Rotate(axis, _theta[i], Space.World);
 
           
-                //Intento de aplicar solo swing, no funciona
-                //   Quaternion swing = GetSwing(_tentacles[numeroTentaculo].Bones[i].transform.localRotation);
-                //    _tentacles[numeroTentaculo].Bones[i].transform.localRotation = swing * _tentacles[numeroTentaculo].Bones[i].transform.localRotation;
-
-
-               // _tentacles[numeroTentaculo].Bones[i].transform.localRotation = GetSwing(_tentacles[numeroTentaculo].Bones[i].transform.localRotation);
+                  //Intento de aplicar solo swing, no acaba de ir.
+                  //Quaternion swing = GetSwing(_tentacles[numeroTentaculo].Bones[i].transform.localRotation);
+                  //_tentacles[numeroTentaculo].Bones[i].transform.localRotation = swing; //Hace bien el swing, no se crean nudos y siempre mira a camara, pero es muy inestable y tiembla
+                
             }
             _tries++;
         }
