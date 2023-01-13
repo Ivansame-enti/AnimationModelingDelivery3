@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,7 +43,7 @@ public class MovingBall : MonoBehaviour
 
     private float _simulationTime = 0.3f;
     private float _simulationIterations = 50f;
-
+    public TextMeshProUGUI CoinText;
     private Vector3 hitPoint;
 
     // Start is called before the first frame update
@@ -105,7 +106,7 @@ public class MovingBall : MonoBehaviour
         Vector3 rotationVelocity = Vector3.Cross(movementEulerSpeed, radiusVector) / (ballRadius * ballRadius*5);// CALCULAMOS LA VELOCIDAD DE ROTACION
         ballDirectionMagnus = Vector3.Cross(rotationVelocity, ballDirection.normalized);
 
-
+        CoinText.text = rotationVelocity.ToString();
         //Vector3 MagnusForce = S * ballDirectionMagnus;
 
         //Vector3 finalForce = MagnusForce + ballDirection.normalized * ballSpeed;
@@ -116,7 +117,7 @@ public class MovingBall : MonoBehaviour
         magnusForce = magnusCoefficient * ballDirectionMagnus;
         Debug.Log(magnusForce);
 
-        movementEulerSpeed = movementEulerSpeed + magnusForce + _acceleration * Time.deltaTime;  //ALELUYA //SI MAGNUS POSITIVO EFECTO A LA DERECHA SI ES NEGATIVO EFECTO A LA DERECHA, ESTO DEBERIA CAMBIAR SEGUNN SI LA ROTTAION VELOCITy ES POSITIVA O NOEGATIVA
+        movementEulerSpeed = movementEulerSpeed + magnusForce + _acceleration * Time.deltaTime;  //ALELUYA //SI MAGNUS POSITIVO EFECTO A LA DERECHA SI ES NEGATIVO EFECTO A LA DERECHA
         transform.position = (transform.position + movementEulerSpeed * Time.deltaTime);
     }
 
