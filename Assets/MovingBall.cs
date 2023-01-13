@@ -22,6 +22,7 @@ public class MovingBall : MonoBehaviour
     public bool shootBall = false;
     public float ballSpeed=10f;
     public Vector3 movementEulerSpeed;
+    private Vector3 _movementEulerSpeedSimulation, _movementEulerSpeedSimulationMagnus;
     private Vector3 _acceleration;
     private Vector3 ballDirection;
     private Vector3 ballDirectionMagnus;
@@ -31,6 +32,7 @@ public class MovingBall : MonoBehaviour
 
     private Vector3 magnusForce;
     Vector3 angularVelocity;
+    Vector3 _magnusForce2;
 
     public Slider forceSlider;
     public Slider magnusSlider;
@@ -40,18 +42,27 @@ public class MovingBall : MonoBehaviour
     //public GameObject blueArrow;
     public GameObject greenArrow;
     public GameObject redArrow;
+    public GameObject redArrowShoot;
+    public GameObject redArrowMagnus;
 
     private float _simulationTime = 0.3f;
     private float _simulationIterations = 50f;
-    public TextMeshProUGUI CoinText;
+    public TextMeshProUGUI speedText;
     private Vector3 hitPoint;
+    public GameObject blueParticles, greyParticles;
+    private GameObject greyParticleGO, blueParticleGO;
+    private float lastForceValue, lastMagnusValue;
 
     // Start is called before the first frame update
     void Start()
     {
+        lastForceValue = forceSlider.value;
+        lastMagnusValue = magnusSlider.value;
         greyArrow.SetActive(false);
         //blueArrow.SetActive(false);
         redArrow.SetActive(false);
+        redArrowShoot.SetActive(false);
+        redArrowMagnus.SetActive(false);
         greenArrow.SetActive(false);
 
         _acceleration = new Vector3(0, GRAVITY * MASS, 0);
@@ -67,6 +78,8 @@ public class MovingBall : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I))
         {
             showArrows = !showArrows;
+            _movementEulerSpeedSimulation = (ballTarget.position - this.transform.position).normalized * lastForceValue;
+            _movementEulerSpeedSimulationMagnus = (ballTarget.position - this.transform.position).normalized * lastForceValue;
         }
 
         if (showArrows)
@@ -74,13 +87,40 @@ public class MovingBall : MonoBehaviour
             ShowRedArrow();
             ShowGreenArrow();
             ShowGreyArrow();
-            ShowBlueArrow();
+
+            //Instanciamos las particulas
+            if (blueParticleGO == null) blueParticleGO = Instantiate(blueParticles, this.transform.position, Quaternion.identity) as GameObject;
+            if (greyParticleGO == null) greyParticleGO = Instantiate(greyParticles, this.transform.position, Quaternion.identity) as GameObject;
+
+            //Si se cambian los sliders se resetean las trayectorias de puntos
+            if(lastForceValue != forceSlider.value)
+            {
+                if (greyParticleGO != null) Destroy(greyParticleGO);
+                if (blueParticleGO != null) Destroy(blueParticleGO);
+                _movementEulerSpeedSimulation = (ballTarget.position - this.transform.position).normalized * lastForceValue;
+                _movementEulerSpeedSimulationMagnus = (ballTarget.position - this.transform.position).normalized * lastForceValue;
+                lastForceValue = forceSlider.value;
+            }
+
+            if (lastMagnusValue != magnusSlider.value)
+            {
+                if (blueParticleGO != null) Destroy(blueParticleGO);
+                lastMagnusValue = magnusSlider.value;
+            }
+
+            //Simulamos las particulas
+            EulerStepGreyPoints();
+            //EulerStepBluePoints();
+
         } else
         {
             greyArrow.SetActive(false);
-            //blueArrow.SetActive(false);
             redArrow.SetActive(false);
+            redArrowShoot.SetActive(false);
+            redArrowMagnus.SetActive(false);
             greenArrow.SetActive(false);
+            if (blueParticleGO != null) Destroy(blueParticleGO);
+            if (greyParticleGO != null) Destroy(greyParticleGO);
         }
 
         transform.rotation = Quaternion.identity;
@@ -89,6 +129,15 @@ public class MovingBall : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         //get the Input from Vertical axis
         float verticalInput = Input.GetAxis("Vertical");
+        
+        //Si mueves el target se resetea la trayectoria de puntos
+        if((horizontalInput!= 0 || verticalInput != 0) && showArrows)
+        {
+            _movementEulerSpeedSimulation = (ballTarget.position - this.transform.position).normalized * lastForceValue;
+            _movementEulerSpeedSimulationMagnus = (ballTarget.position - this.transform.position).normalized * lastForceValue;
+            if (blueParticleGO != null) Destroy(blueParticleGO);
+            if (greyParticleGO != null) Destroy(greyParticleGO);
+        }
 
         ballTarget.position = ballTarget.position + new Vector3(-horizontalInput * _movementSpeed * Time.deltaTime, verticalInput * _movementSpeed * Time.deltaTime, 0); //Movemos el target en vez de la pelota
 
@@ -100,31 +149,56 @@ public class MovingBall : MonoBehaviour
 
     private void EulerStep()
     {
-        //
         float magnusCoefficient = magnusSlider.value;
         Vector3 radiusVector = hitPoint - transform.position;  //CALCULAMOS EL VECTOR DEL CENTRO DE LA BOLA A DONDE HITEEMOS
         Vector3 rotationVelocity = Vector3.Cross(movementEulerSpeed, radiusVector) / (ballRadius * ballRadius*5);// CALCULAMOS LA VELOCIDAD DE ROTACION
         ballDirectionMagnus = Vector3.Cross(rotationVelocity, ballDirection.normalized);
 
-        CoinText.text = rotationVelocity.ToString();
-        //Vector3 MagnusForce = S * ballDirectionMagnus;
+        speedText.text = rotationVelocity.ToString();
 
-        //Vector3 finalForce = MagnusForce + ballDirection.normalized * ballSpeed;
         if (magnusCoefficient >= 0)
         {
             ballDirectionMagnus = ballDirectionMagnus * -1;
         }
         magnusForce = magnusCoefficient * ballDirectionMagnus;
-        Debug.Log(magnusForce);
 
-        movementEulerSpeed = movementEulerSpeed + magnusForce + _acceleration * Time.deltaTime;  //ALELUYA //SI MAGNUS POSITIVO EFECTO A LA DERECHA SI ES NEGATIVO EFECTO A LA DERECHA
+        movementEulerSpeed = movementEulerSpeed + magnusForce + _acceleration * Time.deltaTime;
         transform.position = (transform.position + movementEulerSpeed * Time.deltaTime);
+    }
+
+    private void EulerStepGreyPoints()
+    {
+        _movementEulerSpeedSimulation = _movementEulerSpeedSimulation + _acceleration * Time.deltaTime;
+        greyParticleGO.transform.position = (greyParticleGO.transform.position + _movementEulerSpeedSimulation * Time.deltaTime);
+    }
+
+    private void EulerStepBluePoints()
+    {
+        float magnusCoefficient = magnusSlider.value;
+        Vector3 radiusVector = hitPoint - transform.position;  //CALCULAMOS EL VECTOR DEL CENTRO DE LA BOLA A DONDE HITEEMOS
+        Vector3 rotationVelocity = Vector3.Cross(_movementEulerSpeedSimulationMagnus, radiusVector) / (ballRadius * ballRadius * 5);// CALCULAMOS LA VELOCIDAD DE ROTACION
+        Vector3 ballDirectionMagnus2 = Vector3.Cross(rotationVelocity, ballDirection.normalized);
+
+        if (magnusCoefficient >= 0)
+        {
+            ballDirectionMagnus2 = ballDirectionMagnus2 * -1;
+        }
+
+        _magnusForce2 = magnusCoefficient * ballDirectionMagnus2;
+
+        _movementEulerSpeedSimulationMagnus = _movementEulerSpeedSimulationMagnus + _magnusForce2 + _acceleration * Time.deltaTime;
+
+        blueParticleGO.transform.position = (blueParticleGO.transform.position + _movementEulerSpeedSimulationMagnus * Time.deltaTime);
     }
 
     private void ShowRedArrow()
     {
         redArrow.SetActive(true);
         redArrow.transform.rotation = Quaternion.LookRotation(_acceleration, Vector3.up);
+        redArrowShoot.SetActive(true);
+        redArrowShoot.transform.rotation = Quaternion.LookRotation((ballTarget.position - this.transform.position).normalized * forceSlider.value, Vector3.up);
+        redArrowMagnus.SetActive(true);
+        redArrowShoot.transform.rotation = Quaternion.LookRotation(_magnusForce2, Vector3.up);
     }
 
     private void ShowGreenArrow()
@@ -137,11 +211,6 @@ public class MovingBall : MonoBehaviour
     {
         greyArrow.SetActive(true);
         greyArrow.transform.rotation = Quaternion.LookRotation(((ballTarget.position - this.transform.position) * forceSlider.value) + _acceleration * (_simulationTime * _simulationIterations), Vector3.up);
-    }
-
-    private void ShowBlueArrow()
-    {
-        //blueArrow.SetActive(true);
     }
 
     private void OnCollisionEnter(Collision collision)
