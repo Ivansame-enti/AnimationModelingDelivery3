@@ -392,7 +392,14 @@ public class IK_tentacles : MonoBehaviour
                 _theta[i] = Mathf.Clamp(_theta[i], 1, 2);
 
                 _tentacles[numeroTentaculo].Bones[i].transform.Rotate(axis, _theta[i], Space.World);
-                _tentacles[numeroTentaculo].Bones[i].transform.localRotation = GetSwing(_tentacles[numeroTentaculo].Bones[i].transform.localRotation);
+
+          
+                //Intento de aplicar solo swing, no funciona
+                //   Quaternion swing = GetSwing(_tentacles[numeroTentaculo].Bones[i].transform.localRotation);
+                //    _tentacles[numeroTentaculo].Bones[i].transform.localRotation = swing * _tentacles[numeroTentaculo].Bones[i].transform.localRotation;
+
+
+               // _tentacles[numeroTentaculo].Bones[i].transform.localRotation = GetSwing(_tentacles[numeroTentaculo].Bones[i].transform.localRotation);
             }
             _tries++;
         }
