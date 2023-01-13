@@ -33,6 +33,7 @@ public class MovingBall : MonoBehaviour
     private Vector3 magnusForce;
     Vector3 angularVelocity;
     Vector3 _magnusForce2;
+    Vector3 final_force;
 
     public Slider forceSlider;
     public Slider magnusSlider;
