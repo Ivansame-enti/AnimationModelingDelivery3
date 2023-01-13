@@ -47,7 +47,7 @@ Scripts:
 
      Ejercicio 5:
         5.1.- IK_tentacles
-        5.3.- IK_tentacles(No acababa de quedar del todo bien, por eso esta comentado, pero creemos que la fomra de realizarlo era algo parecido a lo que hemos hecho(linea 397 de IK_tentacles))
+        5.3.- IK_tentacles(No acababa de quedar del todo bien, por eso esta comentado, pero creemos que la fomra de realizarlo era algo parecido a lo que hemos hecho.Hace bien el swing, no se crean nudos y siempre mira a camara, pero es muy inestable y tiembla(linea 397 de IK_tentacles y funciones getSwing y getTwist))
 
 --------------------------------------------------------------------------
 
