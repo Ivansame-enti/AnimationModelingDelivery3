@@ -48,7 +48,7 @@ public class MovingBall : MonoBehaviour
     private float _simulationTime = 0.3f;
     private float _simulationIterations = 50f;
     public TextMeshProUGUI speedText;
-    private Vector3 hitPoint;
+    private Vector3 hitPoint, hitPoint2;
     public GameObject blueParticles, greyParticles;
     private GameObject greyParticleGO, blueParticleGO;
     private float lastForceValue, lastMagnusValue;
@@ -74,6 +74,7 @@ public class MovingBall : MonoBehaviour
     void Update()
     {
         if(_myScorpion._tailTarget!=null) hitPoint = new Vector3(_myScorpion._tailTarget.position.x + Mathf.Lerp(-0.5f, +0.5f, Mathf.InverseLerp(magnusSlider.minValue, magnusSlider.maxValue, magnusSlider.value)), _myScorpion._tailTarget.position.y, _myScorpion._tailTarget.position.z);
+        if (blueParticleGO != null) hitPoint2 = new Vector3(blueParticleGO.transform.position.x + Mathf.Lerp(-0.5f, +0.5f, Mathf.InverseLerp(magnusSlider.minValue, magnusSlider.maxValue, magnusSlider.value)), blueParticleGO.transform.position.y, blueParticleGO.transform.position.z);
 
         if (Input.GetKeyDown(KeyCode.I))
         {
@@ -105,12 +106,13 @@ public class MovingBall : MonoBehaviour
             if (lastMagnusValue != magnusSlider.value)
             {
                 if (blueParticleGO != null) Destroy(blueParticleGO);
+                _movementEulerSpeedSimulationMagnus = (ballTarget.position - this.transform.position).normalized * lastForceValue;
                 lastMagnusValue = magnusSlider.value;
             }
 
             //Simulamos las particulas
             EulerStepGreyPoints();
-            //EulerStepBluePoints();
+            EulerStepBluePoints();
 
         } else
         {
@@ -175,15 +177,17 @@ public class MovingBall : MonoBehaviour
     private void EulerStepBluePoints()
     {
         float magnusCoefficient = magnusSlider.value;
-        Vector3 radiusVector = hitPoint - transform.position;  //CALCULAMOS EL VECTOR DEL CENTRO DE LA BOLA A DONDE HITEEMOS
+        
+        Vector3 radiusVector = hitPoint2 - blueParticleGO.transform.position;  //CALCULAMOS EL VECTOR DEL CENTRO DE LA BOLA A DONDE HITEEMOS
         Vector3 rotationVelocity = Vector3.Cross(_movementEulerSpeedSimulationMagnus, radiusVector) / (ballRadius * ballRadius * 5);// CALCULAMOS LA VELOCIDAD DE ROTACION
-        Vector3 ballDirectionMagnus2 = Vector3.Cross(rotationVelocity, ballDirection.normalized);
+        
+        Vector3 ballDirectionMagnus2 = Vector3.Cross(rotationVelocity, (ballTarget.position - this.transform.position).normalized);
 
         if (magnusCoefficient >= 0)
         {
             ballDirectionMagnus2 = ballDirectionMagnus2 * -1;
         }
-
+        
         _magnusForce2 = magnusCoefficient * ballDirectionMagnus2;
 
         _movementEulerSpeedSimulationMagnus = _movementEulerSpeedSimulationMagnus + _magnusForce2 + _acceleration * Time.deltaTime;

@@ -13,6 +13,7 @@ Ivan Sales Méndez (ivan.sales@enti.cat)
 
 Controles:
     R: Reinicia la escena
+    I: Activar/Desactivar guiar
     
 --------------------------------------------------------------------------
 
@@ -27,9 +28,9 @@ Scripts:
 
     Ejercicio 2:
         2.1.- MagnusSliderController (En el objeto slider_force estan los valores que puede tomar), IK_Scorpion
-        2.2.- MovingBall
-        2.3.- MovingBall
-        2.4.- MovingBall
+        2.2.- MovingBall (Funcion EulerStep)
+        2.3.- MovingBall (Se han agregado las flechas y particulas a la escena, la previsualizacion del magnus effect no la acaba de hacer del todo bien en algunos casos)
+        2.4.- MovingBall (Se han agregado las flechas y particulas a la escena, la previsualizacion del magnus effect no la acaba de hacer del todo bien en algunos casos)
 
     Ejercicio 4:
         4.1.- IK_Scorpion
