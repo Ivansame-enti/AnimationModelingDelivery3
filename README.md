@@ -32,6 +32,10 @@ Scripts:
         4.1.- IK_Scorpion
 		4.2.- IK_Scorpion
 
+     Ejercicio 5:
+        5.1.- IK_tentacles
+        5.3.- IK_tentacles(No acababa de quedar del todo bien, por eso esta comentado, pero creemos que la fomra de realizarlo era algo parecido a lo que hemos hecho(linea 397 de IK_tentacles))
+
 --------------------------------------------------------------------------
 
 Explicaciones:
