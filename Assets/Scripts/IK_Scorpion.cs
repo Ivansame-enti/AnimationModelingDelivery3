@@ -80,7 +80,6 @@ public class IK_Scorpion : MonoBehaviour
     private float y_promedio, y_total;
     private Transform posicionInicialBody;
     private Vector3 posicionDeseadaBody, posicionInterpolada,promedio_total, targetDirection;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -101,7 +100,6 @@ public class IK_Scorpion : MonoBehaviour
         limit = new bool[legs.Length];
         impact = new bool[legs.Length];
         y_promedio = 0;
-        
     }
 
     // Update is called once per frame
@@ -129,32 +127,27 @@ public class IK_Scorpion : MonoBehaviour
                     {
                         futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, hitDown[i].point.y, futureLegBases[i].transform.position.z);
                         /*
+                         AQUI INTENTE LA ROTACION, PERO NO ME HA FUNCIONADO
                         Vector3 diferenciaIzq = futureLegBases[0].position - futureLegBases[2].position;
                         Vector3 diferenciaDer = futureLegBases[1].position - futureLegBases[3].position;
                         Vector3 diferenciaTrasera = futureLegBases[4].position - futureLegBases[5].position;
                         Vector3 Cross = Vector3.Cross(diferenciaDer, diferenciaTrasera).normalized;
-                        Vector3 Cross2 = Vector3.Cross(diferenciaIzq, diferenciaDer).normalized;
+                        Vector3 Cross2 = Vector3.Cross(diferenciaIzq, Cross).normalized;
 
-                        Body.transform.Rotate(Cross2,Space.World);
+                        Body.transform.Rotate(Cross2*0.1);
                         */
                     }
                 }
             }
         }
-        
-       y_promedio = y_total / 6;
-       y_promedio = y_promedio + 0.6f;
+        //REALIZO EL PROMEDIO DE LA POSICION Y DE LAS PATAS, PARA APLICARSELO AL CUERPO Y CAMBIE SU POSICION EN EJE Y,
+        //DEPENDIENDO DE LA ALTURA DE LAS PATAS
+       y_promedio = y_total / legs.Length;
+       y_promedio = y_promedio + height;
        posicionInicialBody = Body;
        posicionDeseadaBody = new Vector3(Body.position.x, y_promedio, Body.position.z);
 
-       Body.position = Vector3.Lerp(posicionInicialBody.position, posicionDeseadaBody, lerpDuration);
-        //posicionInterpolada = Vector3.Lerp(posicionInicialBody.position, posicionDeseadaBody, lerpDuration);
-
-        //Body.position = posicionInterpolada;
-
         
-
-
 
         if (animPlaying)
             animTime += Time.deltaTime;
@@ -181,7 +174,9 @@ public class IK_Scorpion : MonoBehaviour
 
         if (animTime < animDuration)
         {
+            
             Body.position = Vector3.Lerp(StartPos.position, EndPos.position, animTime / animDuration);
+            //APLICO LERP DEL PROMEDIO DE LA ALTURA DE LAS PATAS AL CUERPO
             Body.position = Vector3.Lerp(posicionInicialBody.position, posicionDeseadaBody, lerpDuration);
         }
         else if (animTime >= animDuration && animPlaying)
@@ -319,29 +314,29 @@ public class IK_Scorpion : MonoBehaviour
     {
         for (int i = 0; i < _legs.Length; i++)
         {
+            //LERP DE LAS PATAS
             if ((_legFutureBases[i].position - _legRoots[i].position).magnitude > _legThreshold && limit[i] == false)
             {
+                //CADA VEZ QUE SE HACE LA ANIMACION, SE REINICIAN LOS PARAMETROS
                 limit[i] = true;
                 elapsedTime = 0;
                 elapsedTime2 = 0;
                 initialPos[i] = _legRoots[i].position;
                 finalPos[i] = _legFutureBases[i].position;
-                finalPosY[i] = new Vector3(_legFutureBases[i].position.x, _legFutureBases[i].position.y + 0.5f, _legFutureBases[i].position.z);
+                finalPosY[i] = new Vector3(_legFutureBases[i].position.x, _legFutureBases[i].position.y + height, _legFutureBases[i].position.z);
 
             }
             if (limit[i] == true)
             {
                 elapsedTime += Time.deltaTime;
-                //_legRoots[i].position = Vector3.Lerp(initialPos[i], finalPos[i], elapsedTime / lerpDuration);
-
-                
-                //_legRoots[i].position = new Vector3(Mathf.Lerp(initialPos[i].x, finalPos[i].x, elapsedTime / lerpDuration), Mathf.Lerp(initialPos[i].y, finalPosY[i].y, elapsedTime / lerpDuration), Mathf.Lerp(initialPos[i].z, finalPos[i].z, elapsedTime / lerpDuration));
+                //LERP EJE Y
                 _legRoots[i].position = Vector3.Lerp(initialPos[i], finalPosY[i], elapsedTime / lerpDuration);
 
-                if (elapsedTime >= lerpDuration)
+                if (elapsedTime >=lerpDuration)
                 {
                     elapsedTime2 += Time.deltaTime;
-                    _legRoots[i].position = Vector3.Lerp(finalPosY[i], finalPos[i], elapsedTime / lerpDuration);
+                    //CUANDO TERMINA EL LERP EJE Y, DESDE ESA POSICION LLEGA AL FUTURE_BASE
+                    _legRoots[i].position = Vector3.Lerp(finalPosY[i], finalPos[i], elapsedTime2 / lerpDuration);
                     if(elapsedTime2 >= lerpDuration)
                     {
                         limit[i] = false;
@@ -350,7 +345,6 @@ public class IK_Scorpion : MonoBehaviour
                 }
             }
         }
-        Debug.Log(initialPos[0].y);
     }
     
     //Implement Gradient Descent method to move tail if necessary
