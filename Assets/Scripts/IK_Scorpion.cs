@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using OctopusController;
 using System.Linq;
+using System.Drawing;
+using Color = UnityEngine.Color;
 
 public class IK_Scorpion : MonoBehaviour
 {
@@ -25,6 +27,7 @@ public class IK_Scorpion : MonoBehaviour
     public Transform[] legs;
     public Transform[] legTargets;
     public Transform[] futureLegBases;
+    public Transform[] legRayCast;
 
     public Slider forceSlider;
     private bool _sliderGoUp=true;
@@ -32,7 +35,7 @@ public class IK_Scorpion : MonoBehaviour
 
     public Slider magnusSlider;
     private Vector3 _targetWithMagnus;
-    public bool firstTimeMagnus=true;
+    public bool firstTimeMagnus = true;
     private float _map;
 
     /***************************************Iks**************************************/
@@ -51,11 +54,20 @@ public class IK_Scorpion : MonoBehaviour
     Transform[] _legTargets = null;
     Transform[] _legRoots = null;
     Transform[] _legFutureBases = null;
+    Transform[] _raycastPos = null;
+    Vector3[] _finalPosY = null;
     MyTentacleController[] _legs = new MyTentacleController[6];
     bool _startWalk;
     private List<Vector3[]> _copy;
     private List<float[]> _distances;
-    private float _legThreshold = 1.5f;
+    public float _legThreshold;
+    public float lerpDuration;
+    private float elapsedTime, elapsedTime2;
+    float[] complete = null;
+    private bool[] limit;
+    private Vector3[] initialPos = null;
+    private Vector3[] finalPos = null,finalPosY;
+    private Transform copy2;
 
     [SerializeField]
     private float _distanceWeight;
@@ -76,24 +88,73 @@ public class IK_Scorpion : MonoBehaviour
         _endEffector = _tailBones[4];
         for (int i = 0; i < _tailBones.Length; i++) _originalTaillRotations[i] = _tailBones[i].rotation;
 
-        InitLegs(legs,futureLegBases,legTargets);
+        InitLegs(legs, futureLegBases, legTargets, legRayCast);
         InitTail(tail);
+        rayDown = new Ray[legs.Length];
+        hitDown = new RaycastHit[legs.Length];
+        limit = new bool[legs.Length];
+        impact = new bool[legs.Length];
+        y_promedio = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(animPlaying)
+        y_total = 0;
+        for (int i = 0; i < legs.Length; i++)
+        {
+            y_total += _legFutureBases[i].position.y;
+            rayDown[i] = new Ray(legRayCast[i].transform.position, -Vector3.up);
+            //Debug.DrawRay(legRayCast[i].transform.position, -Vector3.up * height);
+            if (Physics.Raycast(rayDown[i], out hitDown[i]))
+            {
+                if (hitDown[i].collider.tag == "Suelo")
+                {
+                    if (hitDown[i].distance > 0.01)
+                    {
+                        futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, hitDown[i].point.y, futureLegBases[i].transform.position.z);
+                        //Debug.Log(hitDown[1].distance);
+                    }
+                }
+                if (hitDown[i].collider.tag == "Obstacle")
+                {
+                    if (hitDown[0].distance > 0.01 || hitDown[2].distance > 0.01 || hitDown[4].distance > 0.01)
+                    {
+                        futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, hitDown[i].point.y, futureLegBases[i].transform.position.z);
+                        /*
+                         AQUI INTENTE LA ROTACION, PERO NO ME HA FUNCIONADO
+                        Vector3 diferenciaIzq = futureLegBases[0].position - futureLegBases[2].position;
+                        Vector3 diferenciaDer = futureLegBases[1].position - futureLegBases[3].position;
+                        Vector3 diferenciaTrasera = futureLegBases[4].position - futureLegBases[5].position;
+                        Vector3 Cross = Vector3.Cross(diferenciaDer, diferenciaTrasera).normalized;
+                        Vector3 Cross2 = Vector3.Cross(diferenciaIzq, Cross).normalized;
+
+                        Body.transform.Rotate(Cross2*0.1);
+                        */
+                    }
+                }
+            }
+        }
+        //REALIZO EL PROMEDIO DE LA POSICION Y DE LAS PATAS, PARA APLICARSELO AL CUERPO Y CAMBIE SU POSICION EN EJE Y,
+        //DEPENDIENDO DE LA ALTURA DE LAS PATAS
+       y_promedio = y_total / legs.Length;
+       y_promedio = y_promedio + height;
+       posicionInicialBody = Body;
+       posicionDeseadaBody = new Vector3(Body.position.x, y_promedio, Body.position.z);
+
+        
+
+        if (animPlaying)
             animTime += Time.deltaTime;
 
         NotifyTailTarget();
-        
+
         if (Input.GetKey(KeyCode.Space))
         {
             if (forceSlider.value >= forceSlider.maxValue) _sliderGoUp = false;
             if (forceSlider.value <= forceSlider.minValue) _sliderGoUp = true;
 
-            if(_sliderGoUp) forceSlider.value += Time.deltaTime * _slideSpeed;
+            if (_sliderGoUp) forceSlider.value += Time.deltaTime * _slideSpeed;
             else forceSlider.value -= Time.deltaTime * _slideSpeed;
         }
 
@@ -108,7 +169,10 @@ public class IK_Scorpion : MonoBehaviour
 
         if (animTime < animDuration)
         {
+            
             Body.position = Vector3.Lerp(StartPos.position, EndPos.position, animTime / animDuration);
+            //APLICO LERP DEL PROMEDIO DE LA ALTURA DE LAS PATAS AL CUERPO
+            Body.position = Vector3.Lerp(posicionInicialBody.position, posicionDeseadaBody, lerpDuration);
         }
         else if (animTime >= animDuration && animPlaying)
         {
@@ -118,7 +182,7 @@ public class IK_Scorpion : MonoBehaviour
 
         UpdateIK();
     }
-    
+
     //Function to send the tail target transform to the dll
     public void NotifyTailTarget()
     {
@@ -139,14 +203,21 @@ public class IK_Scorpion : MonoBehaviour
     }
 
     /*****************************IKs**********************************/
-    public void InitLegs(Transform[] LegRoots, Transform[] LegFutureBases, Transform[] LegTargets)
+    public void InitLegs(Transform[] LegRoots, Transform[] LegFutureBases, Transform[] LegTargets, Transform[] LegRayCast)
     {
         _legs = new MyTentacleController[LegRoots.Length];
         _legRoots = new Transform[LegRoots.Length];
         _legTargets = new Transform[LegTargets.Length];
         _legFutureBases = new Transform[LegFutureBases.Length];
+        _raycastPos = new Transform[legs.Length];
         _copy = new List<Vector3[]>();
         _distances = new List<float[]>();
+        _finalPosY = new Vector3[LegRoots.Length];
+        complete = new float[LegRoots.Length];
+        elapsedTime = 0;
+        initialPos = new Vector3[LegRoots.Length];
+        finalPos = new Vector3[LegRoots.Length];
+        finalPosY = new Vector3[LegRoots.Length];
 
         //Legs init
         for (int i = 0; i < LegRoots.Length; i++)
@@ -156,9 +227,12 @@ public class IK_Scorpion : MonoBehaviour
             _legRoots[i] = LegRoots[i];
             _legTargets[i] = LegTargets[i];
             _legFutureBases[i] = LegFutureBases[i];
+            _raycastPos[i] = LegRayCast[i];
             _copy.Add(new Vector3[_legs[i].Bones.Length]);
             _distances.Add(new float[_legs[i].Bones.Length]);
-
+            initialPos[i] = _legRoots[i].position;
+            finalPos[i] = _legFutureBases[i].position;
+            _finalPosY[i] = new Vector3(_legFutureBases[i].position.x, _legFutureBases[i].position.y + 0.5f, _legFutureBases[i].position.z);
             for (int x = 0; x < _legs[i].Bones.Length; x++)
             {
                 if (x < _legs[i].Bones.Length - 1)
@@ -219,7 +293,7 @@ public class IK_Scorpion : MonoBehaviour
     //Create the apropiate animations and update the IK from the legs and tail
     public void UpdateIK()
     {
-        if(_tailTarget!=null) updateTail();
+        if (_tailTarget != null) updateTail();
         if (_startWalk)
         {
             updateLegs();
@@ -231,14 +305,39 @@ public class IK_Scorpion : MonoBehaviour
     {
         for (int i = 0; i < _legs.Length; i++)
         {
-            if ((_legFutureBases[i].position - _legRoots[i].position).magnitude > _legThreshold)
+            //LERP DE LAS PATAS
+            if ((_legFutureBases[i].position - _legRoots[i].position).magnitude > _legThreshold && limit[i] == false)
             {
-                _legRoots[i].position = _legFutureBases[i].position;
+                //CADA VEZ QUE SE HACE LA ANIMACION, SE REINICIAN LOS PARAMETROS
+                limit[i] = true;
+                elapsedTime = 0;
+                elapsedTime2 = 0;
+                initialPos[i] = _legRoots[i].position;
+                finalPos[i] = _legFutureBases[i].position;
+                finalPosY[i] = new Vector3(_legFutureBases[i].position.x, _legFutureBases[i].position.y + height, _legFutureBases[i].position.z);
+
+            }
+            if (limit[i] == true)
+            {
+                elapsedTime += Time.deltaTime;
+                //LERP EJE Y
+                _legRoots[i].position = Vector3.Lerp(initialPos[i], finalPosY[i], elapsedTime / lerpDuration);
+
+                if (elapsedTime >=lerpDuration)
+                {
+                    elapsedTime2 += Time.deltaTime;
+                    //CUANDO TERMINA EL LERP EJE Y, DESDE ESA POSICION LLEGA AL FUTURE_BASE
+                    _legRoots[i].position = Vector3.Lerp(finalPosY[i], finalPos[i], elapsedTime2 / lerpDuration);
+                    if(elapsedTime2 >= lerpDuration)
+                    {
+                        limit[i] = false;
+                    }
+                    
+                }
             }
         }
-
     }
-
+    
     //Implement Gradient Descent method to move tail if necessary
     private void updateTail()
     {
