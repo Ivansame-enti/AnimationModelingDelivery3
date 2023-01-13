@@ -1239,8 +1239,11 @@ MonoBehaviour:
   _slideSpeed: 20
   magnusSlider: {fileID: 1172727220}
   firstTimeMagnus: 1
+  _legThreshold: 1.5
+  lerpDuration: 0.9
   _distanceWeight: 1
   _angleWeight: 10000
+  height: 0.8
 --- !u!4 &263851881 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8005202564104028492, guid: c9ae8800298c5904a805978e2ff06201,

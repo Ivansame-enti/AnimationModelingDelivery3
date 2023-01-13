@@ -55,6 +55,7 @@ public class IK_Scorpion : MonoBehaviour
     Transform[] _legRoots = null;
     Transform[] _legFutureBases = null;
     Transform[] _raycastPos = null;
+
     Vector3[] _finalPosY = null;
     MyTentacleController[] _legs = new MyTentacleController[6];
     bool _startWalk;
@@ -75,6 +76,13 @@ public class IK_Scorpion : MonoBehaviour
     [SerializeField]
     private float _angleWeight;
 
+    public float height;
+    private Ray[] _rayDown;
+    private RaycastHit[] _hitDown;
+    private float _y_promedio, _y_total;
+    private Transform _posicionInicialBody;
+    private Vector3 _posicionDeseadaBody;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -90,37 +98,34 @@ public class IK_Scorpion : MonoBehaviour
 
         InitLegs(legs, futureLegBases, legTargets, legRayCast);
         InitTail(tail);
-        rayDown = new Ray[legs.Length];
-        hitDown = new RaycastHit[legs.Length];
+        _rayDown = new Ray[legs.Length];
+        _hitDown = new RaycastHit[legs.Length];
         limit = new bool[legs.Length];
-        impact = new bool[legs.Length];
-        y_promedio = 0;
+        _y_promedio = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        y_total = 0;
+        _y_total = 0;
         for (int i = 0; i < legs.Length; i++)
         {
-            y_total += _legFutureBases[i].position.y;
-            rayDown[i] = new Ray(legRayCast[i].transform.position, -Vector3.up);
-            //Debug.DrawRay(legRayCast[i].transform.position, -Vector3.up * height);
-            if (Physics.Raycast(rayDown[i], out hitDown[i]))
+            _y_total += _legFutureBases[i].position.y;
+            _rayDown[i] = new Ray(legRayCast[i].transform.position, -Vector3.up);
+            if (Physics.Raycast(_rayDown[i], out _hitDown[i]))
             {
-                if (hitDown[i].collider.tag == "Suelo")
+                if (_hitDown[i].collider.tag == "Suelo")
                 {
-                    if (hitDown[i].distance > 0.01)
+                    if (_hitDown[i].distance > 0.01)
                     {
-                        futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, hitDown[i].point.y, futureLegBases[i].transform.position.z);
-                        //Debug.Log(hitDown[1].distance);
+                        futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, _hitDown[i].point.y, futureLegBases[i].transform.position.z);
                     }
                 }
-                if (hitDown[i].collider.tag == "Obstacle")
+                if (_hitDown[i].collider.tag == "Obstacle")
                 {
-                    if (hitDown[0].distance > 0.01 || hitDown[2].distance > 0.01 || hitDown[4].distance > 0.01)
+                    if (_hitDown[0].distance > 0.01 || _hitDown[2].distance > 0.01 || _hitDown[4].distance > 0.01)
                     {
-                        futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, hitDown[i].point.y, futureLegBases[i].transform.position.z);
+                        futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, _hitDown[i].point.y, futureLegBases[i].transform.position.z);
                         /*
                          AQUI INTENTE LA ROTACION, PERO NO ME HA FUNCIONADO
                         Vector3 diferenciaIzq = futureLegBases[0].position - futureLegBases[2].position;
@@ -132,15 +137,20 @@ public class IK_Scorpion : MonoBehaviour
                         Body.transform.Rotate(Cross2*0.1);
                         */
                     }
+                    if (_hitDown[1].distance > 0.01 || _hitDown[3].distance > 0.01 || _hitDown[5].distance > 0.01)
+                    {
+                        futureLegBases[i].transform.position = new Vector3(futureLegBases[i].transform.position.x, _hitDown[i].point.y, futureLegBases[i].transform.position.z);
+
+                    }
                 }
             }
         }
         //REALIZO EL PROMEDIO DE LA POSICION Y DE LAS PATAS, PARA APLICARSELO AL CUERPO Y CAMBIE SU POSICION EN EJE Y,
         //DEPENDIENDO DE LA ALTURA DE LAS PATAS
-       y_promedio = y_total / legs.Length;
-       y_promedio = y_promedio + height;
-       posicionInicialBody = Body;
-       posicionDeseadaBody = new Vector3(Body.position.x, y_promedio, Body.position.z);
+        _y_promedio = _y_total / legs.Length;
+        _y_promedio = _y_promedio + height;
+       _posicionInicialBody = Body;
+       _posicionDeseadaBody = new Vector3(Body.position.x, _y_promedio, Body.position.z);
 
         
 
@@ -172,7 +182,7 @@ public class IK_Scorpion : MonoBehaviour
             
             Body.position = Vector3.Lerp(StartPos.position, EndPos.position, animTime / animDuration);
             //APLICO LERP DEL PROMEDIO DE LA ALTURA DE LAS PATAS AL CUERPO
-            Body.position = Vector3.Lerp(posicionInicialBody.position, posicionDeseadaBody, lerpDuration);
+            Body.position = Vector3.Lerp(_posicionInicialBody.position, _posicionDeseadaBody, lerpDuration);
         }
         else if (animTime >= animDuration && animPlaying)
         {

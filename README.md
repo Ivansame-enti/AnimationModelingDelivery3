@@ -27,7 +27,11 @@ Scripts:
 
     Ejercicio 2:
         2.1.- MagnusSliderController, IK_Scorpion
-
+    Ejercicio 3:
+	3.1.- IK_Scorpion (El escorpion tiene unos gameobjects en cada pata situados a una cierta altura. Estos tienen un raycast que miran hacia abajo y detectan si hay suelo o obstaculos. Las patas pisan donde el raycast impacte).
+	3.2.- IK_Scorpion (Se han añadido obstaculos. Estos han de tener el tag Obstacles y el terreno debe tener el tag Suelo).
+	3.3.- IK_Scorpion - (Funcion updateLegPos. Un lerp se realiza en un eje Y, y donde finaliza ese, comienza otro lerp que finaliza donde se situa _future_base).
+	3.4.- IK_Scorpion - (Al inicio del update, realizo el promedio de la posicion de las patas en el eje Y, esto se le aplica al cuerpo cambiando su eje Y en funcion de la posicion de las patas.Esto se aplica en un Lerp).
     Ejercicio 4:
         4.1.- IK_Scorpion
 		4.2.- IK_Scorpion
