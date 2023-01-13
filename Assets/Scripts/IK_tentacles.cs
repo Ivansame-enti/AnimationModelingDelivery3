@@ -37,8 +37,6 @@ namespace OctopusController
 
                     _bones[3] = _bones[2].GetChild(1);
 
-
-
                     //TODO: in _endEffectorsphere you keep a reference to the base of the leg
 
                     _endEffectorSphere = _bones[3];
@@ -144,10 +142,12 @@ public class IK_tentacles : MonoBehaviour
 
     readonly float _epsilon = 0.1f;
 
+    private Quaternion _sumatoryRot;
+
     #region public methods
 
     /*******************************************************/
-    
+
     public bool stopBall = true; //Bool que indica si tiene que parar la pelota o no
 
     #region public methods
@@ -320,15 +320,11 @@ public class IK_tentacles : MonoBehaviour
             _region3b = false;
             _region4b = false;
             _timer = 0f;
-            //stopBall = !stopBall;
         }
         else
         {
             _timer += Time.deltaTime;
         }
-
-
-
     }
 
     void ResetTentacle(int t, Transform target)
@@ -348,6 +344,24 @@ public class IK_tentacles : MonoBehaviour
         {
             _tries = 0;
         }
+    }
+
+    public Quaternion GetSwing(Quaternion rot3)
+    {
+        Quaternion twist = GetTwist(rot3);
+
+        Quaternion inversa = Quaternion.Inverse(twist);
+
+        Quaternion swing = rot3*inversa;
+
+        return swing;
+    }
+
+    public static Quaternion GetTwist(Quaternion rot3)
+    {
+        Quaternion q = new Quaternion(0, rot3.y, 0, rot3.w);
+        q.Normalize();
+        return q;
     }
 
     void ApplyCCD(int numeroTentaculo, Transform targetPosT)
@@ -374,11 +388,18 @@ public class IK_tentacles : MonoBehaviour
 
                 }
                 _theta[i] = (180 / Mathf.PI) * _theta[i];
-                if (_theta[i] > 0.1)
-                {
-                    _tentacles[numeroTentaculo].Bones[i].transform.Rotate(axis, _theta[i], Space.World);
-                }
 
+                _theta[i] = Mathf.Clamp(_theta[i], 1, 2);
+
+                _tentacles[numeroTentaculo].Bones[i].transform.Rotate(axis, _theta[i], Space.World);
+
+          
+                //Intento de aplicar solo swing, no funciona
+                //   Quaternion swing = GetSwing(_tentacles[numeroTentaculo].Bones[i].transform.localRotation);
+                //    _tentacles[numeroTentaculo].Bones[i].transform.localRotation = swing * _tentacles[numeroTentaculo].Bones[i].transform.localRotation;
+
+
+               // _tentacles[numeroTentaculo].Bones[i].transform.localRotation = GetSwing(_tentacles[numeroTentaculo].Bones[i].transform.localRotation);
             }
             _tries++;
         }
