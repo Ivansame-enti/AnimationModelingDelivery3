@@ -12,15 +12,17 @@ Ivan Sales Méndez (ivan.sales@enti.cat)
 --------------------------------------------------------------------------
 
 Controles:
-    R: Reinicia la escena
-    I: Activar/Desactivar guiar
-    X/Z: Ajustar magus
+
+    R: Reinicia la escena,
+    I: Activar/Desactivar guiar,
+    X/Z: Ajustar magus,
     Espacio: Mantener para cargar el disparo y dejarlo ir para chutar
 --------------------------------------------------------------------------
 
 --------------------------------------------------------------------------
 
 Scripts:
+
     Ejercicio 1:
         1.1.- IK_tentacles y RestartController
         1.2.- MovingBall
@@ -50,6 +52,7 @@ Scripts:
 --------------------------------------------------------------------------
 
 Explicaciones:
+
     1.5.- Se ha utilizado Euler Steps para calcular la trayectoria de la pelota hacia el target. En este, se suman la fuerza que recibe del golpe multiplicada por la dirección normalizada, más la aceleración (la cual es de -1 de gravedad (para que esta no afecte demasiado y acabe llegando más o menos al target indicado, y la masa de la pelota que es de 1) multiplicada por el tiempo.
 	
     2.5.- Para calcular la RotationVelocity utilizamos esta linea: Vector3 rotationVelocity = Vector3.Cross(movementEulerSpeed, radiusVector) / (ballRadius * ballRadius); Donde vemos que hacemos un cross product entre la suma de fuerzas acumuladas por Euler y el radiusVector(que es el vector que va del centro de la pelota hacia el hit point), una vez tenemos esto lo dividimos entre el Radio de la pelota al cuadrado. ANTOACIÓN: aunque a variable se llame movementEulerSpeed, no es una velocidad, es la suma de la fuerza acumulada por Euler, por lo que es una fuerza.

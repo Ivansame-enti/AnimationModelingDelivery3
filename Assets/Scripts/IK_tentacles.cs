@@ -90,8 +90,10 @@ public class IK_tentacles : MonoBehaviour
     [SerializeField]
     Transform[] _randomTargets;
 
-    MyOctopusController _myController = new MyOctopusController();
-
+    MyOctopusController _myController = new MyOctopusController();
+
+
+
     [Header("Exercise 3")]
     [SerializeField, Range(0, 360)]
     float _twistMin;
@@ -168,8 +170,10 @@ public class IK_tentacles : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {
-
+    {
+
+
+
         _myController.TestLogging(gameObject.name);
         Init(_tentaclesOriginal, _randomTargets);
 
@@ -185,7 +189,8 @@ public class IK_tentacles : MonoBehaviour
     {
         UpdateTentacles();
 
-        if (_updateTwistSwingLimits)
+        if (_updateTwistSwingLimits)
+
         {
             _myController.TwistMax = _twistMax;
             _myController.TwistMin = _twistMin;
@@ -370,8 +375,10 @@ public class IK_tentacles : MonoBehaviour
         if (_tries <= _mtries)
         {
             for (int i = _tentacles[numeroTentaculo].Bones.Length - 2; i >= 0; i--)
-            {
-                // transform.LookAt(camera);
+            {
+
+                // transform.LookAt(camera);
+
                 Vector3 r1 = (_tentacles[numeroTentaculo].Bones[_tentacles[numeroTentaculo].Bones.Length - 2].transform.position - _tentacles[numeroTentaculo].Bones[i].transform.position).normalized;
                 Vector3 r2 = (targetPosT.transform.position - _tentacles[numeroTentaculo].Bones[i].transform.position).normalized;
 
@@ -404,8 +411,11 @@ public class IK_tentacles : MonoBehaviour
                // _tentacles[numeroTentaculo].Bones[i].transform.localRotation = GetSwing(_tentacles[numeroTentaculo].Bones[i].transform.localRotation);
             }
             _tries++;
-        }
+        }
+
         #endregion
-        /*******************************************************************************************************************************************/
-    }
+        /*******************************************************************************************************************************************/
+
+    }
+
 }
